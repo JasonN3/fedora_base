@@ -1,0 +1,33 @@
+[Unit]
+Description="First Boot Configuration"
+Requires=network-online.target first-boot_hostname.service
+After=network-online.target first-boot_hostname.service
+ConditionFirstBoot=true
+ConditionPathExists=/usr/lib/vault/role_id
+ConditionPathExists=/etc/vault/secret_id
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
+[Service]
+Type=exec
+User=vault
+Group=vault
+ProtectHome=tmpfs
+PrivateTmp=yes
+PrivateDevices=yes
+SecureBits=keep-caps
+AmbientCapabilities=CAP_IPC_LOCK
+CapabilityBoundingSet=CAP_SYSLOG CAP_IPC_LOCK
+Environment=HOSTNAME=%H
+NoNewPrivileges=yes
+ExecStart=/usr/lib/firstboot/run_playbook.sh
+KillMode=process
+KillSignal=SIGINT
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+LimitNOFILE=65536
+LimitMEMLOCK=infinity
+
+[Install]
+WantedBy=multi-user.target

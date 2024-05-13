@@ -1,0 +1,15 @@
+---
+- name: Joing Domain
+  hosts: localhost
+  vars:
+    vault_server: ${VAULT_SERVER}
+    
+  tasks:
+  - name: Get host secrets
+    community.hashi_vault.vault_kv2_get:
+      url: {{ vault_server }}
+      auth_method: approle
+      role_id: "{{ lookup('ansible.builtin.file', '/usr/lib/vault/role_id') }}"
+      secret_id: "{{ lookup('ansible.builtin.file', '/etc/vault/secret_id') }}"
+      path: "secrets/immutable-os/nodes/{{ ansible_facts['nodename'] }}"
+    register: vault_host
