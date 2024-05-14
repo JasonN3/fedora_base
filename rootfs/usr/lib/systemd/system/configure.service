@@ -1,8 +1,7 @@
 [Unit]
-Description="First Boot Configuration"
+Description="Configure System"
 Requires=network-online.target first-boot_hostname.service
 After=network-online.target first-boot_hostname.service
-ConditionFirstBoot=true
 ConditionPathExists=/usr/lib/vault/role_id
 ConditionPathExists=/etc/vault/secret_id
 StartLimitIntervalSec=60
