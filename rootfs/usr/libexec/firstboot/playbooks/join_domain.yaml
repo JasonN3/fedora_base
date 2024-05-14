@@ -2,11 +2,11 @@
 - name: Joing Domain
   hosts: localhost
   vars:
-    vault_server: ${VAULT_SERVER}
+    vault_server: "{{ lookup('ansible.builtin.env', 'VAULT_ADDR') }}"
   tasks:
     - name: Get common secrets
       community.hashi_vault.vault_kv2_get:
-        url: {{ vault_server }}
+        url: "{{ vault_server }}"
         auth_method: approle
         role_id: "{{ lookup('ansible.builtin.file', '/usr/lib/vault/role_id') }}"
         secret_id: "{{ lookup('ansible.builtin.file', '/etc/vault/secret_id') }}"
