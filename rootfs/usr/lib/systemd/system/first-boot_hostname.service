@@ -1,6 +1,5 @@
 [Unit]
 Description="First Boot Configuration - Set Hostname"
-ConditionFileNotEmpty=!/etc/hostname
 StartLimitIntervalSec=60
 StartLimitBurst=3
 
@@ -15,6 +14,7 @@ SecureBits=keep-caps
 AmbientCapabilities=CAP_IPC_LOCK
 CapabilityBoundingSet=CAP_SYSLOG CAP_IPC_LOCK
 NoNewPrivileges=yes
+ExecCondition=sh -c '[[ -z $(cat /etc/hostname) ]]'
 ExecStart=/usr/lib/firstboot/set_hostname.sh
 KillMode=process
 KillSignal=SIGINT
