@@ -1,6 +1,6 @@
 [Unit]
 Description="First Boot Configuration - Set Hostname"
-ConditionFirstBoot=true
+ConditionFileNotEmpty=!/etc/hostname
 StartLimitIntervalSec=60
 StartLimitBurst=3
 
