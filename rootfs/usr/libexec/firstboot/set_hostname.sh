@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-if [[ -n "$(dmidecode -s system-serial-number)" ]]
+if [[ "$(dmidecode -s system-serial-number)" != "Not Specified" ]]
 then
   new_hostname="${PREFIX}$(dmidecode -s system-serial-number | tr '[:upper:]' '[:lower:]').${DOMAIN}"
 else
