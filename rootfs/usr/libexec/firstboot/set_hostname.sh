@@ -9,4 +9,6 @@ else
   new_hostname="${PREFIX}$(echo ${address} | cut -d. -f3)-$(echo ${address} | cut -d. -f4).${DOMAIN}"
 fi
 
+echo "New hostname: ${new_hostname}"
+
 hostnamectl set-hostname ${new_hostname}
