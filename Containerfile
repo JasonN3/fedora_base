@@ -10,3 +10,6 @@ samba-common-tools oddjob-mkhomedir samba-common \
 sssd authselect
 
 RUN dnf clean all
+
+# Don't reboot unexpectedly
+RUN systemctl disable bootc-fetch-apply-updates.timer
