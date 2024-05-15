@@ -1,6 +1,5 @@
 #!/bin/bash
 
-source playbooks.env
 
 if [[ -n "$(dmidecode -s system-serial-number)" ]]
 then
