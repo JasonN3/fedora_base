@@ -15,9 +15,8 @@ RUN dnf clean all
 RUN systemctl disable bootc-fetch-apply-updates.timer
 
 # Scripts
-COPY scripts /tmp
+COPY scripts/ /tmp/scripts
 
-RUN find /tmp
 ## update_files
 RUN bash /tmp/scripts/update_files/update_files.sh
 
