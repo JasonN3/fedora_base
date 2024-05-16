@@ -3,6 +3,7 @@
 if [[ -n "${VAULT_TOKEN}" ]]
 then
     echo "Token set"
+    vault token lookup | grep policies
 fi
 vault read -format=raw secrets/data/immutable-os/common
 data=$(vault read -format=raw secrets/data/immutable-os/common)
