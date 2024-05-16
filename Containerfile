@@ -16,6 +16,8 @@ RUN systemctl disable bootc-fetch-apply-updates.timer
 
 # Scripts
 COPY scripts /tmp
+
+RUN find /tmp
 ## update_files
 RUN bash /tmp/scripts/update_files/update_files.sh
 
