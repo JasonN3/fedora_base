@@ -20,7 +20,7 @@ CapabilityBoundingSet=CAP_SYSLOG CAP_IPC_LOCK
 Environment=HOSTNAME=%H
 NoNewPrivileges=yes
 EnvironmentFile=-/usr/libexec/firstboot/playbooks.env
-ExecStart=/usr/libexec/firstboot/run_playbook.sh
+ExecStart=/usr/libexec/firstboot/run_scripts.sh
 KillMode=process
 KillSignal=SIGINT
 Restart=on-failure
