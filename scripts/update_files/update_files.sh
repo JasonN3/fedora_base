@@ -2,8 +2,8 @@
 
 if [[ -n "${VAULT_TOKEN}" ]]
 then
-    echo "Token set"
-    vault token lookup | grep policies
+  echo "Token set"
+  vault token lookup | grep policies
 fi
 data=$(vault read -format=raw secrets/data/immutable-os/common)
 
@@ -14,7 +14,11 @@ temploc=$(mktemp -d)
 
 while read -r line
 do
-    file=$(echo $line | cut -f1)
-    cat ${file} | envsubst "$(echo $line | cut -f2-)" > ${temploc}/file
-    mv ${temploc}/file ${file}
+  if [[ -z "${line}" ]]
+  then
+    continue
+  fi
+  file=$(echo $line | cut -d' ' -f1)
+  cat ${file} | envsubst "$(echo $line | cut -d' ' -f2-)" > ${temploc}/file
+  mv ${temploc}/file ${file}
 done < $(dirname -- $0)/files_to_update
