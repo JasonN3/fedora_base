@@ -1,13 +1,8 @@
 #!/bin/bash
 
-if [[ -n "${VAULT_TOKEN}" ]]
-then
-  echo "Token set"
-  vault token lookup | grep policies
-fi
 data=$(vault read -format=raw secrets/data/immutable-os/common)
 
-export DOMAIN=$(echo $data | jq -r '.data.data.domain')
+export DOMAIN=$(echo $data | jq -r '.data.data.domain' | tr '[:lower:]' '[:upper:]')
 export AD_CERTIFICATE=$(echo $data | jq -r '.data.data.domain_certificate')
 
 temploc=$(mktemp -d)
