@@ -49,7 +49,7 @@ jobs:
         run: |
           export VAULT_TOKEN=$(cat .vault-token)
           bash scripts/set_perms/set_perms.sh
-          bash scripts/update_files/update_file.sh
+          bash scripts/update_files/update_files.sh
 
       - name: Buildah Build
         id: build-image
