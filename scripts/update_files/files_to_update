@@ -1,2 +1,2 @@
-/etc/sssd/conf.d/domain.conf DOMAIN GLOBAL_SSH GLOBAL_SUDO MACHINE_SSH MACHINE_SUDO
-/etc/sssd/pki AD_CERTIFICATE
+/etc/sssd/conf.d/domain.conf ${DOMAIN}
+/etc/sssd/pki ${AD_CERTIFICATE}

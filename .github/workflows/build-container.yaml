@@ -8,7 +8,7 @@ on:
 jobs:
   build-container:
     name: Build Container Image
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     permissions:
       contents: read
       packages: write
@@ -32,6 +32,13 @@ jobs:
             type=semver,pattern=v{{version}}
             type=semver,pattern=v{{major}}.{{minor}}
             type=semver,pattern=v{{major}}.{{minor}}.{{patch}}
+
+      - name: Auth with Vault
+        run: |
+          vault write auth/approle/login \
+            -field=token -format=raw \
+            role_id=$(cat /home/runner/.vault-role) \
+            secret_id={{ secrets.VAULT_SECRET }} > .vault-token
 
       - name: Buildah Build
         id: build-image
