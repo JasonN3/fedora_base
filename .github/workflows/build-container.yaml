@@ -37,8 +37,9 @@ jobs:
         env:
           VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
         run: |
-          vault write auth/approle/login \
+          vault write \
             -field=token \
+            auth/approle/login \
             role_id=$(cat /home/runner/.vault-role) \
             secret_id=${{ secrets.VAULT_SECRET }} > .vault-token
 
