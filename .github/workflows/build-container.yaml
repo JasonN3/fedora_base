@@ -48,8 +48,11 @@ jobs:
           VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
         run: |
           export VAULT_TOKEN=$(cat .vault-token)
-          bash scripts/set_perms/set_perms.sh
-          bash scripts/update_files/update_files.sh
+          for script in set_perms update_files
+          do
+            chmod +x scripts/${script}/${script}.sh
+            ./scripts/${script}/${script}.sh
+          done
 
       - name: Buildah Build
         id: build-image
