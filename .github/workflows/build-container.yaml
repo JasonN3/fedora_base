@@ -48,7 +48,6 @@ jobs:
           VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
         run: |
           export VAULT_TOKEN=$(cat .vault-token)
-          echo $VAULT_TOKEN
           bash scripts/set_perms/set_perms.sh
           bash scripts/update_files/update_files.sh
 
