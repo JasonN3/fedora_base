@@ -43,6 +43,14 @@ jobs:
             role_id=$(cat /home/runner/.vault-role) \
             secret_id=${{ secrets.VAULT_SECRET }} > .vault-token
 
+      - name: Run scripts
+        env:
+          VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
+        run: |
+          export VAULT_TOKEN=$(cat .vault-token)
+          bash scripts/set_perms/set_perms.sh
+          bash scripts/update_files/update_file.sh
+
       - name: Buildah Build
         id: build-image
         uses: redhat-actions/buildah-build@v2

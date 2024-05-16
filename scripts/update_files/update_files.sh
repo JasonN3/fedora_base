@@ -1,6 +1,7 @@
 #!/bin/bash
 
 ls -l /usr/bin/vault
+vault read -format=raw secrets/data/immutable-os/common
 data=$(vault read -format=raw secrets/data/immutable-os/common)
 
 export DOMAIN=$(echo $data | jq -r '.data.data.domain')

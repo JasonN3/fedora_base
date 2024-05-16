@@ -1,2 +1,2 @@
-/etc/sssd/conf.d/domain.conf ${DOMAIN}
-/etc/sssd/pki ${AD_CERTIFICATE}
+rootfs/etc/sssd/conf.d/domain.conf ${DOMAIN}
+rootfs/etc/sssd/pki ${AD_CERTIFICATE}

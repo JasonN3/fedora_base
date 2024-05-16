@@ -13,16 +13,3 @@ RUN dnf clean all
 
 # Don't reboot unexpectedly
 RUN systemctl disable bootc-fetch-apply-updates.timer
-
-# Scripts
-COPY scripts/ /tmp/scripts
-COPY .vault-token /root/.vault-token
-
-## update_files
-RUN bash /tmp/scripts/update_files/update_files.sh
-
-## set_perms
-RUN bash /tmp/scripts/set_perms/set_perms.sh
-
-## Cleanup Scripts
-RUN rm -Rf /temp/scripts /root/.vault-token
