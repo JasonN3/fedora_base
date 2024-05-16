@@ -1,9 +1,10 @@
 #!/bin/bash
 
+ls -l /usr/bin/vault
 data=$(vault read -format=raw secrets/data/immutable-os/common)
 
 export DOMAIN=$(echo $data | jq -r '.data.data.domain')
-export AD_CERTIFICATE=$(ehco $data | jq -r '.data.data.domain_certificate')
+export AD_CERTIFICATE=$(echo $data | jq -r '.data.data.domain_certificate')
 
 temploc=$(mktemp -d)
 
