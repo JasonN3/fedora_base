@@ -1,3 +1,3 @@
-0400 /etc/sssd/conf.d/domain.conf
+0400 /usr/etc/sssd/conf.d/domain.conf
 0500 /usr/libexec/firstboot/*.sh
 0500 /usr/libexec/firstboot/scripts/*
