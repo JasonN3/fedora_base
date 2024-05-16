@@ -15,6 +15,6 @@ temploc=$(mktemp -d)
 while read -r line
 do
     file=$(echo $line | cut -f1)
-    envsubst "$(echo $line | cut -f2-)" < ${file} > ${temploc}/file
+    cat ${file} | envsubst "$(echo $line | cut -f2-)" > ${temploc}/file
     mv ${temploc}/file ${file}
 done < $(dirname -- $0)/files_to_update
