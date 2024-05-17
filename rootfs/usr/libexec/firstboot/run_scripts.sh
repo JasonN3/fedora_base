@@ -7,7 +7,7 @@ vault write auth/approle/login \
 
 for script in $(ls $(dirname -- $0)/scripts)
 do
-  ./scripts/${script}
+  $(dirname -- $0)/scripts/${script}
 done
 
 # rm ~/.vault-token
