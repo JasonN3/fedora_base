@@ -9,8 +9,8 @@ StartLimitBurst=3
 
 [Service]
 Type=exec
-User=vault
-Group=vault
+User=root
+Group=root
 ProtectHome=tmpfs
 PrivateTmp=yes
 PrivateDevices=yes
