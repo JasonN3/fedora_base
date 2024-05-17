@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 vault write \
   -field=token \
   auth/approle/login \
@@ -10,3 +12,5 @@ for script in $(ls $(dirname -- $0)/scripts/*.sh)
 do
   ${script}
 done
+
+rm /etc/vault/secret_id
