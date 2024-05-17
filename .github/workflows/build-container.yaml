@@ -4,6 +4,10 @@ on:
   push:
     branch:
       - main
+  
+  schedule:
+    # Patch Tuesday (Second Tuesday of the month)
+    - cron: "0 7 8-14 * 2"
 
 jobs:
   build-container:
