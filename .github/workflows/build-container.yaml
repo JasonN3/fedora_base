@@ -73,3 +73,8 @@ jobs:
           tags: ${{ steps.build-image.outputs.tags }}
           username: ${{ github.actor }}
           password: ${{ github.token }}
+
+      - name: Trigger other builds
+        run: |
+          chmod +x scripts/trigger_builds/trigger_builds.sh
+          ./scripts/trigger_builds/trigger_builds.sh
