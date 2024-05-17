@@ -6,6 +6,7 @@ do
   then
     continue
   fi
+  echo "Triggering ${{ github.repository_owner }}/${repository}"
   curl -L \
     -X POST \
     -H "Accept: application/vnd.github+json" \
