@@ -6,9 +6,7 @@ vault write \
   role_id=$(cat /usr/lib/vault/role_id) \
   secret_id=$(cat /etc/vault/secret_id) > ~/.vault-token
 
-for script in $(ls $(dirname -- $0)/scripts)
+for script in $(ls $(dirname -- $0)/scripts/*.sh)
 do
-  $(dirname -- $0)/scripts/${script}
+  ${script}
 done
-
-# rm ~/.vault-token

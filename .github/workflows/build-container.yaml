@@ -50,6 +50,10 @@ jobs:
       - name: Run scripts
         env:
           VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
+          GLOBAL_ADMINS: ${{ secrets.GLOBAL_ADMINS }}
+          GLOBAL_SSH: ${{ secrets.GLOBAL_SSH }}
+          MACHINE_ADMINS_FORMAT: ${{ secrets.MACHINE_ADMINS_FORMAT }}
+          MACHINE_SSH_FORMAT: ${{ secrets.MACHINE_SSH_FORMAT }}
         run: |
           export VAULT_TOKEN=$(cat .vault-token)
           for script in set_perms update_files
