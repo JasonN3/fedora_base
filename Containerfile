@@ -13,3 +13,6 @@ RUN dnf clean all
 
 # Don't reboot unexpectedly
 RUN systemctl disable bootc-fetch-apply-updates.timer
+
+# Trust the domain certificate
+RUN trust anchor /usr/etc/sssd/pki/sssd_auth_ca_db.pem

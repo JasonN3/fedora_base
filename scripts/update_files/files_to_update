@@ -1,3 +1,3 @@
-rootfs/usr/etc/sssd/conf.d/domain.conf ${DOMAIN}
+rootfs/usr/etc/sssd/sssd.conf ${DOMAIN}
 rootfs/usr/etc/sssd/pki/sssd_auth_ca_db.pem ${AD_CERTIFICATE}
 rootfs/usr/etc/krb5.conf ${DOMAIN}
