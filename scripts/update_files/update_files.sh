@@ -4,8 +4,8 @@ data=$(vault read -format=raw secrets/data/immutable-os/common)
 
 export DOMAIN=$(echo $data | jq -r '.data.data.domain' | tr '[:lower:]' '[:upper:]')
 export AD_CERTIFICATE=$(echo $data | jq -r '.data.data.domain_certificate')
-export GLOBAL_ADMINS_ESCAPED=$(echo $GLOBAL_ADMINS | tr ' ' '\ ')
-export MACHINE_ADMINS_ESCAPED=$(echo $MACHINE_ADMINS | tr ' ' '\ ')
+export GLOBAL_ADMINS_ESCAPED=$(echo $GLOBAL_ADMINS | sed 's/ /\\ /g')
+export MACHINE_ADMINS_FORMAT_ESCAPED=$(echo $MACHINE_ADMINS_FORMAT | sed 's/ /\\ /g')
 
 temploc=$(mktemp -d)
 
