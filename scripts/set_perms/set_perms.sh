@@ -1,6 +1,6 @@
 #!/bin/bash
 
-while read -r line
+while read -ar line
 do
   if [[ -z "${line}" ]]
   then
