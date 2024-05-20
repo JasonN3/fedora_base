@@ -4,11 +4,15 @@ on:
   push:
     branch:
       - main
+  
+  schedule:
+    # Patch Tuesday (Second Tuesday of the month)
+    - cron: "0 7 8-14 * 2"
 
 jobs:
   build-container:
     name: Build Container Image
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     permissions:
       contents: read
       packages: write
@@ -33,6 +37,31 @@ jobs:
             type=semver,pattern=v{{major}}.{{minor}}
             type=semver,pattern=v{{major}}.{{minor}}.{{patch}}
 
+      - name: Auth with Vault
+        env:
+          VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
+        run: |
+          vault write \
+            -field=token \
+            auth/approle/login \
+            role_id=$(cat /home/runner/.vault-role) \
+            secret_id=${{ secrets.VAULT_SECRET }} > .vault-token
+
+      - name: Run scripts
+        env:
+          VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
+          GLOBAL_ADMINS: ${{ secrets.GLOBAL_ADMINS }}
+          GLOBAL_SSH: ${{ secrets.GLOBAL_SSH }}
+          MACHINE_ADMINS_FORMAT: ${{ secrets.MACHINE_ADMINS_FORMAT }}
+          MACHINE_SSH_FORMAT: ${{ secrets.MACHINE_SSH_FORMAT }}
+        run: |
+          export VAULT_TOKEN=$(cat .vault-token)
+          for script in set_perms update_files
+          do
+            chmod +x scripts/${script}/${script}.sh
+            ./scripts/${script}/${script}.sh
+          done
+
       - name: Buildah Build
         id: build-image
         uses: redhat-actions/buildah-build@v2
@@ -48,3 +77,11 @@ jobs:
           tags: ${{ steps.build-image.outputs.tags }}
           username: ${{ github.actor }}
           password: ${{ github.token }}
+
+      - name: Trigger other builds
+        env:
+          repo_owner: ${{ github.repository_owner }}
+          token: ${{ secrets.TRIGGER_PAT }}
+        run: |
+          chmod +x scripts/trigger_builds/trigger_builds.sh
+          ./scripts/trigger_builds/trigger_builds.sh

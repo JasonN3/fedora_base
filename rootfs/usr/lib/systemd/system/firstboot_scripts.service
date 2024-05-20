@@ -1,0 +1,33 @@
+[Unit]
+Description="First Boot Configuration - Scripts"
+Requires=network-online.target
+After=network-online.target firstboot_hostname.service
+ConditionPathExists=/usr/lib/vault/role_id
+ConditionPathExists=/etc/vault/secret_id
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
+[Service]
+Type=exec
+User=root
+Group=root
+ProtectHome=tmpfs
+PrivateTmp=yes
+PrivateDevices=yes
+SecureBits=keep-caps
+AmbientCapabilities=CAP_IPC_LOCK
+CapabilityBoundingSet=CAP_SYSLOG CAP_IPC_LOCK
+Environment=HOSTNAME=%H
+NoNewPrivileges=yes
+EnvironmentFile=-/usr/libexec/firstboot/playbooks.env
+ExecStart=/usr/libexec/firstboot/run_scripts.sh
+KillMode=process
+KillSignal=SIGINT
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+LimitNOFILE=65536
+LimitMEMLOCK=infinity
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,4 @@
+rootfs/usr/etc/sssd/sssd.conf ${DOMAIN} ${GLOBAL_ADMINS} ${GLOBAL_SSH} ${MACHINE_ADMINS_FORMAT} ${MACHINE_SSH_FORMAT}
+rootfs/usr/etc/sssd/pki/sssd_auth_ca_db.pem ${AD_CERTIFICATE}
+rootfs/usr/etc/krb5.conf ${DOMAIN}
+rootfs/usr/etc/sudoers.d/domain ${GLOBAL_ADMINS_ESCAPED} ${MACHINE_ADMINS_FORMAT_ESCAPED}

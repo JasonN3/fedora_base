@@ -1,0 +1,1 @@
+rootfs/usr/etc/sssd/sssd.conf ${HOSTNAME_SHORT}
