@@ -79,6 +79,8 @@ jobs:
           password: ${{ github.token }}
 
       - name: Trigger other builds
+        env:
+          repo_owner: ${{ github.repository_owner }}
         run: |
           chmod +x scripts/trigger_builds/trigger_builds.sh
           ./scripts/trigger_builds/trigger_builds.sh
