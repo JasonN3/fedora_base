@@ -81,6 +81,7 @@ jobs:
       - name: Trigger other builds
         env:
           repo_owner: ${{ github.repository_owner }}
+          token: ${{ secrets.TRIGGER_PAT }}
         run: |
           chmod +x scripts/trigger_builds/trigger_builds.sh
           ./scripts/trigger_builds/trigger_builds.sh
