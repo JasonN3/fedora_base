@@ -11,6 +11,6 @@ do
     continue
   fi
   file=$(echo "${line}" | cut -d' ' -f1)
-  cat "${file}" | envsubst "$(echo $line | cut -d' ' -f2-)" > "${temploc}/file"
+  envsubst "$(echo "${line}" | cut -d' ' -f2-)" > "${temploc}/file" < "${file}"
   mv "${temploc}/file" "${file}"
 done < "$(dirname -- "$0")/update_files"

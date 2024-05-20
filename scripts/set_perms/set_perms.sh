@@ -7,4 +7,4 @@ do
     continue
   fi
   chmod "${line}"
-done < "$(dirname -- $0)/files"
+done < "$(dirname -- "$0")/files"
