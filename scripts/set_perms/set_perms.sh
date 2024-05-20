@@ -6,5 +6,5 @@ do
   then
     continue
   fi
-  chmod ${line}
+  chmod "${line[@]}"
 done < "$(dirname -- "$0")/files"
