@@ -2,7 +2,7 @@
 
 while read -r repository
 do
-  if [[ -z "${line}" ]]
+  if [[ -z "${repository}" ]]
   then
     continue
   fi
