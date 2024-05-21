@@ -2,6 +2,10 @@ FROM quay.io/fedora/fedora-bootc:40
 
 COPY rootfs/ /
 
+# Freeze repo data
+RUN dnf makecache
+RUN echo "cacheonly=True" >> /etc/dnf/dnf.conf
+
 RUN dnf install -y vault ansible-core tmux
 
 # Install packages for domain joining
