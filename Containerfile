@@ -13,8 +13,6 @@ RUN dnf install -y chrony krb5-workstation \
 samba-common-tools oddjob-mkhomedir samba-common \
 sssd authselect
 
-RUN dnf clean all
-
 # Don't reboot unexpectedly
 RUN rm -f /usr/lib/systemd/system/default.target.wants/bootc-fetch-apply-updates.timer
 
