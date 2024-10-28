@@ -1,5 +1,5 @@
 [Unit]
-Description="First Boot Configuration - Scripts"
+Description="Configuration - Scripts"
 Requires=network-online.target
 After=network-online.target firstboot_hostname.service
 ConditionPathExists=/usr/lib/vault/role_id
@@ -19,8 +19,8 @@ AmbientCapabilities=CAP_IPC_LOCK
 CapabilityBoundingSet=CAP_SYSLOG CAP_IPC_LOCK
 Environment=HOSTNAME=%H
 NoNewPrivileges=yes
-EnvironmentFile=-/usr/libexec/firstboot/playbooks.env
-ExecStart=/usr/libexec/firstboot/run_scripts.sh
+EnvironmentFile=-/usr/libexec/config/playbooks.env
+ExecStart=/usr/libexec/config/run_scripts.sh
 KillMode=process
 KillSignal=SIGINT
 Restart=on-failure

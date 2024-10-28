@@ -1,5 +1,5 @@
 [Unit]
-Description="First Boot Configuration - Set Hostname"
+Description="Set Hostname"
 StartLimitIntervalSec=60
 StartLimitBurst=3
 
@@ -14,10 +14,10 @@ SecureBits=keep-caps
 AmbientCapabilities=CAP_IPC_LOCK
 CapabilityBoundingSet=CAP_SYSLOG CAP_IPC_LOCK
 NoNewPrivileges=yes
-EnvironmentFile=-/usr/libexec/firstboot/playbooks.env
+EnvironmentFile=-/usr/libexec/config/playbooks.env
 ExecCondition=sh -c '[[ -z $(cat /etc/hostname) ]]'
-ExecStart=/usr/libexec/firstboot/set_hostname.sh
-WorkingDirectory=/usr/libexec/firstboot
+ExecStart=/usr/libexec/config/set_hostname.sh
+WorkingDirectory=/usr/libexec/config
 KillMode=process
 KillSignal=SIGINT
 Restart=on-failure
