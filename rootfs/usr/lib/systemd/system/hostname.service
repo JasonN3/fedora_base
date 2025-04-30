@@ -2,6 +2,8 @@
 Description="Set Hostname"
 StartLimitIntervalSec=60
 StartLimitBurst=3
+After=network-online.target
+
 
 [Service]
 Type=exec
@@ -16,7 +18,7 @@ CapabilityBoundingSet=CAP_SYSLOG CAP_IPC_LOCK
 NoNewPrivileges=yes
 EnvironmentFile=-/usr/libexec/config/playbooks.env
 ExecCondition=sh -c '[[ -z $(cat /etc/hostname) ]]'
-ExecStart=/usr/libexec/config/set_hostname.sh
+ExecStart=/usr/sbin/ansible-playbook /usr/libexec/config/main.yaml
 WorkingDirectory=/usr/libexec/config
 KillMode=process
 KillSignal=SIGINT

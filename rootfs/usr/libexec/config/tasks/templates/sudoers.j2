@@ -1,0 +1,2 @@
+%{{ common_info.data.global_admins }} ALL=(ALL) ALL
+%{{ common_info.data.machine_admins | format(ansible_hostname) }} ALL=(ALL) ALL

@@ -1,0 +1,26 @@
+---
+- name: Configure System
+  hosts: localhost
+  become: true
+  vars:
+    VAULT_ADDR: lookup('ansible.builtin.env', 'VAULT_ADDR')
+  tasks:
+  - name: Authenticate with Vault and get token
+    community.general.hashi_vault_auth:
+      url: "{{ VAULT_ADDR }}"
+      method: "approle"
+      role_id: "{{ lookup('file', '/etc/vault/role_id') | trim }}"
+      secret_id: "{{ lookup('file', '/etc/vault/secret_id') | trim }}"
+    register: vault_auth
+
+  - name: Read Common Information
+    community.general.hashi_vault:
+      url: "{{ VAULT_ADDR }}"
+      token: "{{ vault_auth.auth.client_token }}"
+      path: "immutable-os/common"
+    register: common_info
+
+  - name: Include tasks from tasks directory
+    ansible.builtin.include_tasks: "{{ item }}"
+    with_fileglob:
+      - "{{ tasks_dir }}/*.yaml"
