@@ -15,6 +15,7 @@ on:
 jobs:
   build-container:
     name: Build Container Image
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
