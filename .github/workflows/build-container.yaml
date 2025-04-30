@@ -4,6 +4,9 @@ on:
   push:
     branch:
       - main
+  pull_request:
+    branch:
+      - main
   
   schedule:
     # Patch Tuesday (Second Tuesday of the month)
