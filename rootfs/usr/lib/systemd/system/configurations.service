@@ -17,8 +17,8 @@ AmbientCapabilities=CAP_IPC_LOCK
 CapabilityBoundingSet=CAP_SYSLOG CAP_IPC_LOCK
 Environment=HOSTNAME=%H
 NoNewPrivileges=yes
-EnvironmentFile=-/usr/libexec/config/playbooks.env
-ExecStart=/usr/libexec/config/run_scripts.sh
+EnvironmentFile=-/etc/vault/playbooks.env
+ExecStart=/usr/sbin/ansible-playbook /usr/libexec/config/main.yaml
 KillMode=process
 KillSignal=SIGINT
 Restart=on-failure
