@@ -9,7 +9,7 @@ RUN dnf install -y dnf5-plugins && \
 
 COPY rootfs/ /
 
-RUN dnf install -y vault ansible-core tmux && dnf clean all
+RUN dnf install -y vault python3-hvac ansible-core tmux && dnf clean all
 
 RUN ansible-galaxy collection install -r /usr/libexec/config/requirements.yaml -p /usr/share/ansible/collections
 
