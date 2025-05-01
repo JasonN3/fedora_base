@@ -11,7 +11,7 @@ COPY rootfs/ /
 
 RUN dnf install -y vault ansible-core tmux && dnf clean all
 
-RUN ansible-galaxy install -r /usr/libexec/config/requirements.yaml -p /usr/share/ansible/collections
+RUN ansible-galaxy collection install -r /usr/libexec/config/requirements.yaml -p /usr/share/ansible/collections
 
 # Install packages for domain joining
 RUN dnf install -y chrony krb5-workstation \
