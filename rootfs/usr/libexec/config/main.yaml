@@ -3,8 +3,8 @@
   hosts: localhost
   become: true
   vars:
-    VAULT_ADDR: lookup('ansible.builtin.env', 'VAULT_ADDR')
-    VAULT_ENGINGE_MOUNT_POINT: lookup('ansible.builtin.env', 'VAULT_ENGINGE_MOUNT_POINT')
+    VAULT_ADDR: "{{ lookup('ansible.builtin.env', 'VAULT_ADDR') }}"
+    VAULT_ENGINGE_MOUNT_POINT: "{{ lookup('ansible.builtin.env', 'VAULT_ENGINGE_MOUNT_POINT') }}"
   tasks:
   - name: Authenticate with Vault and get token
     community.hashi_vault.vault_login:
