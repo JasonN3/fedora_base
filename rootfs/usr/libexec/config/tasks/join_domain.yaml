@@ -1,15 +1,15 @@
-- name: Write /etc/sssd/conf.d/{{ common_info.data.domain | lower }}.conf
+- name: Write /etc/sssd/conf.d/{{ common_info.secret.domain | lower }}.conf
   ansible.builtin.template:
     src: "templates/sssd.conf.j2"
-    dest: "/etc/sssd/conf.d/{{ common_info.data.domain | lower }}.conf"
+    dest: "/etc/sssd/conf.d/{{ common_info.secret.domain | lower }}.conf"
     owner: root
     group: root
     mode: 0600
 
-- name: Write /etc/krb5.conf.d/{{ common_info.data.domain | lower }}.conf
+- name: Write /etc/krb5.conf.d/{{ common_info.secret.domain | lower }}.conf
   ansible.builtin.template:
     src: "templates/krb5.conf.j2"
-    dest: "/etc/krb5.conf.d/{{ common_info.data.domain | lower }}.conf"
+    dest: "/etc/krb5.conf.d/{{ common_info.secret.domain | lower }}.conf"
     owner: root
     group: root
     mode: 0600
@@ -17,12 +17,12 @@
 - name: Write /etc/sssd/pki/sssd_auth_ca_db.pem
   ansible.builtin.copy:
     dest: /etc/sssd/pki/sssd_auth_ca_db.pem
-    content: "{{ common_info.data.domain_certificate }}"
+    content: "{{ common_info.secret.domain_certificate }}"
 
-- name: Write /etc/sudoers.d/{{ common_info.data.domain | lower }}
+- name: Write /etc/sudoers.d/{{ common_info.secret.domain | lower }}
   ansible.builtin.template:
     src: "templates/sudoers.j2"
-    dest: "/etc/krb5.conf.d/{{ common_info.data.domain | lower }}"
+    dest: "/etc/krb5.conf.d/{{ common_info.secret.domain | lower }}"
     owner: root
     group: root
     mode: 0600

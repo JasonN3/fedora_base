@@ -4,19 +4,22 @@
   become: true
   vars:
     VAULT_ADDR: lookup('ansible.builtin.env', 'VAULT_ADDR')
+    VAULT_ENGINGE_MOUNT_POINT: lookup('ansible.builtin.env', 'VAULT_ENGINGE_MOUNT_POINT')
   tasks:
   - name: Authenticate with Vault and get token
-    community.general.hashi_vault_auth:
+    community.hashi_vault.vault_login:
       url: "{{ VAULT_ADDR }}"
-      method: "approle"
+      auth_method: "approle"
       role_id: "{{ lookup('file', '/etc/vault/role_id') | trim }}"
       secret_id: "{{ lookup('file', '/etc/vault/secret_id') | trim }}"
     register: vault_auth
 
   - name: Read Common Information
-    community.general.hashi_vault:
+    community.hashi_vault.vault_kv2_get:
       url: "{{ VAULT_ADDR }}"
-      token: "{{ vault_auth.auth.client_token }}"
+      method: token
+      token: "{{ vault_auth.login.auth.client_token }}"
+      engine_mount_point: "{{ VAULT_ENGINGE_MOUNT_POINT }}"
       path: "immutable-os/common"
     register: common_info
 
