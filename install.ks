@@ -7,4 +7,4 @@ autopart --nohome
 
 timezone America/New_York
 
-ostreecontainer --url=ghcr.io/jasonn3/fedora_base:pr-2 --transport=registry --no-signature-verification
+ostreecontainer --url=ghcr.io/jasonn3/fedora_base:main --transport=registry --no-signature-verification
