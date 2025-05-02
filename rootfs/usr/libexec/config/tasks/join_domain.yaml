@@ -1,0 +1,81 @@
+# Join a domain using method described at https://www.redhat.com/en/blog/joining-rhel-microsoft-active-directory
+
+- name: Write /etc/sssd/conf.d/{{ common_info.secret.domain | lower }}.conf
+  ansible.builtin.template:
+    src: "templates/sssd.conf.j2"
+    dest: "/etc/sssd/conf.d/{{ common_info.secret.domain | lower }}.conf"
+    owner: root
+    group: root
+    mode: 0400
+
+- name: Write /etc/krb5.conf.d/{{ common_info.secret.domain | lower }}.conf
+  ansible.builtin.template:
+    src: "templates/krb5.conf.j2"
+    dest: "/etc/krb5.conf.d/{{ common_info.secret.domain | lower }}.conf"
+    owner: root
+    group: root
+    mode: 0444
+
+- name: Write /etc/sssd/pki/sssd_auth_ca_db.pem
+  ansible.builtin.copy:
+    dest: /etc/sssd/pki/sssd_auth_ca_db.pem
+    content: "{{ common_info.secret.domain_certificate }}"
+  register: cert_result
+
+- name: Trust the domain certificate
+  ansible.builtin.command:
+    cmd: trust anchor /etc/sssd/pki/sssd_auth_ca_db.pem
+  when: cert_result is changed
+
+- name: Write /etc/sudoers.d/{{ common_info.secret.domain | lower }}
+  ansible.builtin.template:
+    src: "templates/sudoers.j2"
+    dest: "/etc/sudoers.d/{{ common_info.secret.domain | lower }}"
+    owner: root
+    group: root
+    mode: 0440
+
+- name: Read OS release information
+  ansible.builtin.slurp:
+    path: /etc/os-release
+  register: os_release_content
+
+- name: Set OS release facts
+  ansible.builtin.set_fact:
+    os_info: "{{ dict(os_release_content.content | b64decode | trim | split('\n') | map('split', '=') | list) }}"
+
+- name: Join {{ common_info.secret.domain | lower }}
+  ansible.builtin.command:
+    cmd: /usr/sbin/adcli join -U {{ common_info.secret.domain_join_user }} \
+          --os-name="{{ os_info.NAME }}" \
+          --os-version="{{ os_info.VERSION }}" \
+          --os-service-pack="{{ os_info.VERSION_ID }}" \
+          --stdin
+    stdin: "{{ common_info.secret.domain_join_password }}"
+    creates: /etc/krb5.keytab
+  no_log: True
+
+- name: Read authselect status
+  ansible.builtin.slurp:
+    src: /etc/authselect/authselect.conf
+  register: authselect_conf
+
+- name: Process authselect status
+  ansible.builtin.set_fact:
+    authselect_current: "{{ (authselect_conf['content'] | b64decode).splitlines()[0] }}"
+    authselect_features: "{{ (authselect_conf['content'] | b64decode).splitlines()[1:] }}"
+
+- name: Set authselect profile
+  ansible.builtin.command:
+    cmd: /usr/sbin/authselect select sssd
+  when: authselect_current != "sssd"
+
+- name: Enable authselect features
+  ansible.builtin.command:
+    cmd: /usr/sbin/authselect enable-feature {{ feature }}
+  loop_control:
+    loop_var: feature
+  with_list:
+    - with-mkhomedir
+    - with-smartcard
+  when: not feature in authselect_features

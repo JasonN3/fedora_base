@@ -1,9 +1,7 @@
 [Unit]
-Description="Configuration - Scripts"
+Description="Configuration Scripts"
 Requires=network-online.target
-After=network-online.target firstboot_hostname.service
-ConditionPathExists=/usr/lib/vault/role_id
-ConditionPathExists=/etc/vault/secret_id
+After=network-online.target hostname.service
 StartLimitIntervalSec=60
 StartLimitBurst=3
 
@@ -11,7 +9,7 @@ StartLimitBurst=3
 Type=exec
 User=root
 Group=root
-ProtectHome=tmpfs
+ProtectHome=no
 PrivateTmp=yes
 PrivateDevices=yes
 SecureBits=keep-caps
@@ -19,8 +17,8 @@ AmbientCapabilities=CAP_IPC_LOCK
 CapabilityBoundingSet=CAP_SYSLOG CAP_IPC_LOCK
 Environment=HOSTNAME=%H
 NoNewPrivileges=yes
-EnvironmentFile=-/usr/libexec/config/playbooks.env
-ExecStart=/usr/libexec/config/run_scripts.sh
+EnvironmentFile=-/etc/vault/playbooks.env
+ExecStart=/usr/sbin/ansible-playbook /usr/libexec/config/main.yaml
 KillMode=process
 KillSignal=SIGINT
 Restart=on-failure
