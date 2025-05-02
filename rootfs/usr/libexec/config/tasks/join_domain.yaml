@@ -18,6 +18,12 @@
   ansible.builtin.copy:
     dest: /etc/sssd/pki/sssd_auth_ca_db.pem
     content: "{{ common_info.secret.domain_certificate }}"
+  register: cert_result
+
+- name: Trust the domain certificate
+  ansible.builtin.command:
+    cmd: trust anchor /etc/sssd/pki/sssd_auth_ca_db.pem
+  when: cert_result is changed
 
 - name: Write /etc/sudoers.d/{{ common_info.secret.domain | lower }}
   ansible.builtin.template:
@@ -26,3 +32,9 @@
     owner: root
     group: root
     mode: 0600
+
+- name: Join {{ common_info.secret.domain | lower }}
+  ansible.builtin.command:
+    cmd: adcli join -U {{ common_info.secret.domain_join_user }} --stdin
+    stdin: "{{ common_info.secret.domain_join_password }}"
+    creates: /etc/krb5.keytab
