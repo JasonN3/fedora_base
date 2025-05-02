@@ -42,7 +42,7 @@
 
 - name: Set OS release facts
   ansible.builtin.set_fact:
-    os_info: "{{ dict(os_release_content.content | b64decode | splitlines | map('regex_replace', '^#.*', '') | map('split', '=') | list) }}"
+    os_info: "{{ dict(os_release_content.content | b64decode | split("\n") | map('regex_replace', '^#.*', '') | map('split', '=') | list) }}"
 
 
 - name: Join {{ common_info.secret.domain | lower }}
