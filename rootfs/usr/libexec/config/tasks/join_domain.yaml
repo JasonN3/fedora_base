@@ -42,12 +42,11 @@
 
 - name: Set OS release facts
   ansible.builtin.set_fact:
-    os_info: "{{ dict(os_release_content.content | b64decode | split('\n') | map('regex_replace', '^#.*', '') | map('split', '=') | list) }}"
-
+    os_info: "{{ dict(os_release_content.content | b64decode | trim | split('\n') | map('split', '=') | list) }}"
 
 - name: Join {{ common_info.secret.domain | lower }}
   ansible.builtin.command:
-    cmd: adcli join -U {{ common_info.secret.domain_join_user }} \
+    cmd: /usr/sbin/adcli join -U {{ common_info.secret.domain_join_user }} \
           --os-name="{{ os_info.NAME }}" \
           --os-version="{{ os_info.VERSION }}" \
           --os-service-pack="{{ os_info.VERSION_ID }}" \
@@ -64,11 +63,19 @@
 - name: Process authselect status
   ansible.builtin.set_fact:
     authselect_current: "{{ (authselect_conf['content'] | b64decode).splitlines()[0] }}"
-    authselect_features: "{{ (authselect_conf['content'] | b64decode).splitlines()[1:] | split }}"
+    authselect_features: "{{ (authselect_conf['content'] | b64decode).splitlines()[1:] }}"
 
-- name: debug
-  ansible.builtin.debug:
-    var: authselect_current
-- name: debug2
-  ansible.builtin.debug:
-    var: authselect_features
+- name: Set authselect profile
+  ansible.builtin.command:
+    cmd: /usr/sbin/authselect select sssd
+  when: authselect_current != "sssd"
+
+- name: Enable authselect features
+  ansible.builtin.command:
+    cmd: /usr/sbin/authselect enable-feature {{ feature }}
+  loop_control:
+    loop_var: feature
+  with_list:
+    - with-mkhomedir
+    - with-smartcard
+  when: not feature in authselect_features
