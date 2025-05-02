@@ -3,10 +3,10 @@ dns_lookup_realm = true
 dns_lookup_kdc = true
 forwardable = true
 rdns = true
-default_realm = {{ common_info.data.domain | upper }}
+default_realm = {{ common_info.secret.domain | upper }}
 
 [realms]
-{{ common_info.data.domain | upper }} = {
+{{ common_info.secret.domain | upper }} = {
 pkinit_anchors = DIR:/etc/sssd/pki
-  pkinit_kdc_hostname = {{ common_info.data.domain | upper }}
+  pkinit_kdc_hostname = {{ common_info.secret.domain | upper }}
 }

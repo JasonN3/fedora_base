@@ -26,4 +26,4 @@
   - name: Include tasks from tasks directory
     ansible.builtin.include_tasks: "{{ item }}"
     with_fileglob:
-      - "{{ tasks_dir }}/*.yaml"
+      - "tasks/*.yaml"
