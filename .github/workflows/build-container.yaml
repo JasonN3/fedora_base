@@ -40,14 +40,6 @@ jobs:
             type=semver,pattern=v{{major}}.{{minor}}
             type=semver,pattern=v{{major}}.{{minor}}.{{patch}}
 
-      - name: Run scripts
-        run: |
-          for script in set_perms
-          do
-            chmod +x scripts/${script}/${script}.sh
-            ./scripts/${script}/${script}.sh
-          done
-
       - name: Buildah Build
         id: build-image
         uses: redhat-actions/buildah-build@v2
