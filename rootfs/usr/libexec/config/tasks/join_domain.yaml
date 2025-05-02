@@ -14,7 +14,7 @@
     dest: "/etc/krb5.conf.d/{{ common_info.secret.domain | lower }}.conf"
     owner: root
     group: root
-    mode: 0400
+    mode: 0444
 
 - name: Write /etc/sssd/pki/sssd_auth_ca_db.pem
   ansible.builtin.copy:
@@ -33,7 +33,7 @@
     dest: "/etc/sudoers.d/{{ common_info.secret.domain | lower }}"
     owner: root
     group: root
-    mode: 0444
+    mode: 0440
 
 - name: Read OS release information
   ansible.builtin.slurp:
