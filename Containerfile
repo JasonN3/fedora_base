@@ -1,4 +1,4 @@
-FROM quay.io/fedora/fedora-bootc:42
+FROM quay.io/fedora/fedora-bootc:41
 
 # Install and enable flightctl-agent
 RUN dnf install -y dnf5-plugins && \
