@@ -102,7 +102,7 @@ jobs:
             echo "Pulling ${tag}-amd64"
             podman pull ${tag}-amd64
             echo "Pulling ${tag}-arm64"
-            podman pull ${tag}-arm
+            podman pull ${tag}-arm64
           done
 
       - name: Generate manifest
