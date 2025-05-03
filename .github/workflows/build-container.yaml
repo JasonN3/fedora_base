@@ -42,7 +42,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           flavor: |
-            suffix=${{ matrix.arch }}
+            suffix=-${{ matrix.arch }}
           images: |
             ghcr.io/${{ github.repository }}
           tags: |
