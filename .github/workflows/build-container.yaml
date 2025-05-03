@@ -14,8 +14,18 @@ on:
 
 jobs:
   build-container:
+    strategy:
+      matrix:
+        os:
+          - ubuntu-24.04
+          - ubuntu-24.04-arm
+        include:
+          - os: ubuntu-24.04
+            arch: amd64
+          - os: ubuntu-24.04-arm
+            arch: arm64
     name: Build Container Image
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     permissions:
       contents: read
       packages: write
@@ -31,6 +41,8 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
+          flavor: |
+            suffix=-${{ matrix.arch }}
           images: |
             ghcr.io/${{ github.repository }}
           tags: |
@@ -64,3 +76,53 @@ jobs:
         run: |
           chmod +x scripts/trigger_builds/trigger_builds.sh
           ./scripts/trigger_builds/trigger_builds.sh
+
+  combine-tags:
+    name: Combine Tags
+    runs-on: ubuntu-24.04
+    needs: build-container
+    permissions:
+      packages: write
+    steps:
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ghcr.io/${{ github.repository }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern=v{{version}}
+            type=semver,pattern=v{{major}}.{{minor}}
+            type=semver,pattern=v{{major}}.{{minor}}.{{patch}}
+
+      - name: Pull image
+        run: |
+          for tag in ${{ steps.meta.outputs.tags }}
+          do
+            echo "Pulling ${tag}-amd64"
+            podman pull ${tag}-amd64
+            echo "Pulling ${tag}-arm64"
+            podman pull ${tag}-arm64
+          done
+
+      - name: Generate manifest
+        run: |
+          for tag in ${{ steps.meta.outputs.tags }}
+          do
+            podman manifest create ${tag}
+            podman manifest add ${tag} \
+              docker://${tag}-amd64 \
+              --arch amd64
+            podman manifest add ${tag} \
+              docker://${tag}-arm64 \
+              --arch arm64
+          done
+      - name: Push manifest
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ghcr.io/${{ github.repository }}
+          tags: ${{ steps.meta.outputs.tags }}
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
