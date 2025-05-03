@@ -1,5 +1,19 @@
 # Join a domain using method described at https://www.redhat.com/en/blog/joining-rhel-microsoft-active-directory
 
+- name: Set chronyd to use the time server
+  ansible.builtin.lineinfile:
+    path: /etc/chrony.conf
+    regexp: '^pool '
+    line: pool {{ common_info.secret.domain }} iburst
+  register: chrony_status
+
+- name: Restart chronyd
+  ansible.builtin.systemd:
+    name: chronyd
+    state: restarted
+    enabled: true
+  when: chrony_status is changed
+
 - name: Write /etc/sssd/conf.d/{{ common_info.secret.domain | lower }}.conf
   ansible.builtin.template:
     src: "templates/sssd.conf.j2"
@@ -46,14 +60,32 @@
 
 - name: Join {{ common_info.secret.domain | lower }}
   ansible.builtin.command:
-    cmd: /usr/sbin/adcli join -U {{ common_info.secret.domain_join_user }} \
-          --os-name="{{ os_info.NAME }}" \
-          --os-version="{{ os_info.VERSION }}" \
-          --os-service-pack="{{ os_info.VERSION_ID }}" \
-          --stdin
+    cmd: /usr/sbin/adcli join -U {{ common_info.secret.domain_join_user }} --stdin-password --use-ldaps
     stdin: "{{ common_info.secret.domain_join_password }}"
     creates: /etc/krb5.keytab
-  no_log: True
+
+- name: Set OS Information
+  ansible.builtin.command:
+    cmd: /usr/sbin/adcli update --os-name="{{ os_info.NAME }}" --os-version="{{ os_info.VERSION }}" --os-service-pack="{{ os_info.VERSION_ID }}"
+
+- name: Collect information about possible authselect locations
+  ansible.builtin.stat:
+    path: "{{ location }}"
+    get_checksum: no
+  register: authselect_stat
+  loop_control:
+    loop_var: location
+  with_list:
+    - /usr/sbin/authselect
+    - /usr/bin/authselect
+
+- name: Set authselect path 
+  ansible.builtin.set_fact:
+    authselect_path: "{{ location.location }}"
+  loop_control:
+    loop_var: location
+  with_list: "{{ authselect_stat.results }}"
+  when: location.stat.exists
 
 - name: Read authselect status
   ansible.builtin.slurp:
@@ -67,12 +99,12 @@
 
 - name: Set authselect profile
   ansible.builtin.command:
-    cmd: /usr/sbin/authselect select sssd
+    cmd: "{{ authselect_path }} select sssd"
   when: authselect_current != "sssd"
 
 - name: Enable authselect features
   ansible.builtin.command:
-    cmd: /usr/sbin/authselect enable-feature {{ feature }}
+    cmd: "{{ authselect_path }} enable-feature {{ feature }}"
   loop_control:
     loop_var: feature
   with_list:
