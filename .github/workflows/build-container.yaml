@@ -81,6 +81,8 @@ jobs:
     name: Combine Tags
     runs-on: ubuntu-24.04
     needs: build-container
+    permissions:
+      packages: write
     steps:
       - name: Docker meta
         id: meta
