@@ -97,28 +97,28 @@ jobs:
 
       - name: Pull image
         run: |
-          for image in ${{ steps.meta.outputs.tags }}
+          for tag in ${{ steps.meta.outputs.tags }}
           do
-            docker pull $image-amd64
-            docker pull $image-arm
+            podman pull ghcr.io/${{ github.repository }}:${tag}-amd64
+            podman pull ghcr.io/${{ github.repository }}:${tag}-arm
           done
 
       - name: Generate manifest
         run: |
-          for image in ${{ steps.meta.outputs.tags }}
+          for tag in ${{ steps.meta.outputs.tags }}
           do
-            podman manifest create $image
-            podman manifest add $image \
-              docker://$image-amd64 \
+            podman manifest create ghcr.io/${{ github.repository }}:${tag}
+            podman manifest add ghcr.io/${{ github.repository }}:${tag} \
+              docker://ghcr.io/${{ github.repository }}:${tag}-amd64 \
               --arch amd64
-            podman manifest add $image \
-              docker://$image-arm64 \
+            podman manifest add ghcr.io/${{ github.repository }}:${tag} \
+              docker://ghcr.io/${{ github.repository }}:${tag}-arm64 \
               --arch arm64
           done
       - name: Push manifest
         uses: redhat-actions/push-to-registry@v2
         with:
-          image: ${{ steps.build-image.outputs.image }}
-          tags: ${{ steps.build-image.outputs.tags }}
+          image: ghcr.io/${{ github.repository }}
+          tags: ${{ steps.meta.outputs.tags }}
           username: ${{ github.actor }}
           password: ${{ github.token }}
