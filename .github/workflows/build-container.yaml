@@ -99,20 +99,22 @@ jobs:
         run: |
           for tag in ${{ steps.meta.outputs.tags }}
           do
-            podman pull ghcr.io/${{ github.repository }}:${tag}-amd64
-            podman pull ghcr.io/${{ github.repository }}:${tag}-arm
+            echo "Pulling ${tag}-amd64"
+            podman pull ${tag}-amd64
+            echo "Pulling ${tag}-arm64"
+            podman pull ${tag}-arm
           done
 
       - name: Generate manifest
         run: |
           for tag in ${{ steps.meta.outputs.tags }}
           do
-            podman manifest create ghcr.io/${{ github.repository }}:${tag}
-            podman manifest add ghcr.io/${{ github.repository }}:${tag} \
-              docker://ghcr.io/${{ github.repository }}:${tag}-amd64 \
+            podman manifest create ${tag}
+            podman manifest add ${tag} \
+              docker://${tag}-amd64 \
               --arch amd64
-            podman manifest add ghcr.io/${{ github.repository }}:${tag} \
-              docker://ghcr.io/${{ github.repository }}:${tag}-arm64 \
+            podman manifest add ${tag} \
+              docker://${tag}-arm64 \
               --arch arm64
           done
       - name: Push manifest
