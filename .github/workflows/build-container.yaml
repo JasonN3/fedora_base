@@ -14,8 +14,18 @@ on:
 
 jobs:
   build-container:
+    strategy:
+      matrix:
+        os:
+          - ubuntu-24.04
+          - ubuntu-24.04-arm
+        include:
+          - os: ubuntu-24.04
+            arch: amd64
+          - os: ubuntu-24.04-arm
+            arch: arm64
     name: Build Container Image
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     permissions:
       contents: read
       packages: write
@@ -31,6 +41,8 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
+          flavor: |
+            suffix=${{ matrix.arch }}
           images: |
             ghcr.io/${{ github.repository }}
           tags: |
@@ -47,7 +59,6 @@ jobs:
           containerfiles: Containerfile
           tags: ${{ steps.meta.outputs.tags || steps.meta_pr.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels || steps.meta_pr.outputs.labels }}
-          platforms: linux/amd64, linux/arm64
 
       - name: Push image
         uses: redhat-actions/push-to-registry@v2
@@ -65,3 +76,49 @@ jobs:
         run: |
           chmod +x scripts/trigger_builds/trigger_builds.sh
           ./scripts/trigger_builds/trigger_builds.sh
+
+  combine-tags:
+    name: Combine Tags
+    runs-on: ubuntu-24.04
+    needs: build-container
+    steps:
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ghcr.io/${{ github.repository }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern=v{{version}}
+            type=semver,pattern=v{{major}}.{{minor}}
+            type=semver,pattern=v{{major}}.{{minor}}.{{patch}}
+
+      - name: Pull image
+        run: |
+          for image in ${{ steps.meta.outputs.tags }}
+          do
+            docker pull $image-amd64
+            docker pull $image-arm
+          done
+
+      - name: Generate manifest
+        run: |
+          for image in ${{ steps.meta.outputs.tags }}
+          do
+            podman manifest create $image
+            podman manifest add $image \
+              docker://$image-amd64 \
+              --arch amd64
+            podman manifest add $image \
+              docker://$image-arm64 \
+              --arch arm64
+          done
+      - name: Push manifest
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
