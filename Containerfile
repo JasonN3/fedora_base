@@ -21,3 +21,7 @@ RUN dnf install -y chrony krb5-workstation \
 
 # Don't reboot unexpectedly
 RUN rm -f /usr/lib/systemd/system/default.target.wants/bootc-fetch-apply-updates.timer
+
+# Copy users and groups from packages
+RUN cp /etc/passwd /usr/etc/passwd && \
+    cp /etc/group /usr/etc/group
