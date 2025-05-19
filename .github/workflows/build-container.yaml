@@ -172,7 +172,7 @@ jobs:
           sudo mount ${disk}p3 /mnt/root
           sudo mkdir /mnt/root/boot
           sudo mount ${disk}p2 /mnt/root/boot
-          sudo mkir /mnt/root/boot/efi
+          sudo mkdir /mnt/root/boot/efi
           sudo mount ${disk}p1 /mnt/root/boot/efi
           sudo podman run \
             --rm \
