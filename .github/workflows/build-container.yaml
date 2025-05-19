@@ -158,6 +158,20 @@ jobs:
           mkdir output
           tag=$(echo ${{ steps.meta.outputs.tags }} | awk '{print $1}')
           truncate -s 10G output/arm64.raw
+          parted output/arm64.raw mklabel msdos
+          parted output/arm64.raw mkpart primary fat16 9437kB 535MB
+          parted output/arm64.raw set 1 boot on
+          parted output/arm64.raw mkpart primary ext4 535MB 1609MB
+          parted output/arm64.raw mkpart primary ext4 1609MB 4302MB
+          parted output/arm64.raw print
+          disk=$(losetup --show -P -f output/arm64.raw)
+          mkfs.vfat ${disk}p1
+          mkfs.ext4 ${disk}p2
+          mkfs.xfs ${disk}p3
+          sudo mkdir -p /mnt/root
+          sudo mount ${disk}p3 /mnt/root
+          sudo mkdir /mnt/root/boot
+          sudo mount ${disk}p2 /mnt/root/boot
           sudo podman run \
             --rm \
             --privileged \
@@ -165,17 +179,22 @@ jobs:
             --security-opt label=type:unconfined_t \
             -v /dev:/dev \
             -v /var/lib/containers:/var/lib/containers \
-            -v $(pwd)/output:/output \
+            -v /mnt/root:/output \
             ${tag}-arm64 \
-            bootc install to-disk \
+            bootc install to-filesystem \
               --generic-image \
-              --filesystem xfs \
-              --via-loopback /output/arm64.raw
+              --target-transport containers-storage \
+              --target-imgref ${tag} \
+              /output
+          umount /mnt/root/boot
+          umount /mnt/root
+          losetup -d ${disk}
           #truncate -s 10G output/arm64-moved.raw
           #disk=$(losetup --show -P -f output/arm64.raw)
           #disk2=$(losetup --show -f output/arm64-moved.raw)
           #parted ${disk2} mklabel gpt
           #parted ${disk2} mkpart 
+          echo "Compressing image..."
           xz -z output/arm64.raw
 
       - name: Upload Artifacts
