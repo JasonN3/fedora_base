@@ -166,7 +166,7 @@ jobs:
             -v /dev:/dev \
             -v /var/lib/containers:/var/lib/containers \
             -v $(pwd)/output:/output \
-            ${tag} \
+            ${tag}-arm64 \
             bootc install to-disk --generic-image --via-loopback /output/arm64.raw
           #truncate -s 10G output/arm64-moved.raw
           #disk=$(losetup --show -P -f output/arm64.raw)
