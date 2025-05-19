@@ -126,3 +126,57 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           username: ${{ github.actor }}
           password: ${{ github.token }}
+  
+  make-raw:
+    name: Create Raw Image
+    runs-on: ubuntu-24.04-arm
+    needs: build-container
+    permissions:
+      packages: write
+    steps:
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ghcr.io/${{ github.repository }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern=v{{version}}
+            type=semver,pattern=v{{major}}.{{minor}}
+            type=semver,pattern=v{{major}}.{{minor}}.{{patch}}
+
+      - name: Pull image
+        run: |
+          echo "Pulling ${tag}-arm64"
+          podman pull ${tag}-arm64
+      
+      - name: Create Image
+        run: |
+          mkdir output
+          tag=$(echo ${{ steps.meta.outputs.tags }} | awk '{print $1}')
+          truncate -s 10G output/arm64.raw
+          podman run \
+            -it \
+            --rm \
+            --privileged \
+            --pid=host \
+            --security-opt label=type:unconfined_t \
+            -v /dev:/dev \
+            -v /var/lib/containers:/var/lib/containers \
+            -v $(pwd)/output:/output \
+            ${tag} \
+            bootc install to-disk --generic-image --via-loopback /output/arm64.raw
+          #truncate -s 10G output/arm64-moved.raw
+          #disk=$(losetup --show -P -f output/arm64.raw)
+          #disk2=$(losetup --show -f output/arm64-moved.raw)
+          #parted ${disk2} mklabel gpt
+          #parted ${disk2} mkpart 
+          xz -z output/arm64.raw
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: output-image
+          path: output/*.raw.xz
