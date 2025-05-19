@@ -149,6 +149,7 @@ jobs:
 
       - name: Pull image
         run: |
+          tag=$(echo ${{ steps.meta.outputs.tags }} | awk '{print $1}')
           echo "Pulling ${tag}-arm64"
           podman pull ${tag}-arm64
       
