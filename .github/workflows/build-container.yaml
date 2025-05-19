@@ -150,23 +150,23 @@ jobs:
 
       - name: Pull image
         run: |
-          tag=$(echo ${{ steps.meta.outputs.tags }} | awk '{print $1}')
+          tag=$(echo "${{ steps.meta.outputs.tags }}" | awk '{print $1}')
           echo "Pulling ${tag}-arm64"
-          podman pull ${tag}-arm64
+          sudo podman pull ${tag}-arm64
 
       - name: Create Image
         run: |
           set -euxo pipefail
-          mkdir output
-          tag=$(echo ${{ steps.meta.outputs.tags }} | awk '{print $1}')
+          mkdir -p output
+          tag=$(echo "${{ steps.meta.outputs.tags }}" | awk '{print $1}')
           rootfs=xfs
           bootfs=ext4
           truncate -s 5G output/arm64.raw
           parted output/arm64.raw mklabel msdos
-          parted output/arm64.raw mkpart primary fat16 1MiB 535MB
+          parted output/arm64.raw mkpart primary fat16 9MiB 501MiB
           parted output/arm64.raw set 1 boot on
-          parted output/arm64.raw mkpart primary ${bootfs} 535MB 1609MB
-          parted output/arm64.raw mkpart primary ${rootfs} 1609MB 100%
+          parted output/arm64.raw mkpart primary ${bootfs} 510MiB 1GiB
+          parted output/arm64.raw mkpart primary ${rootfs} 1534MB 100%
           parted output/arm64.raw print
           disk=$(sudo losetup --show -P -f output/arm64.raw)
           sudo mkfs.vfat -F 32 ${disk}p1
@@ -197,7 +197,7 @@ jobs:
           sudo umount /mnt/root
           sudo losetup -d ${disk}
           echo "Compressing image..."
-          xz -z output/arm64.raw
+          xz -vz -T0 output/arm64.raw
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
