@@ -188,6 +188,7 @@ jobs:
               --target-transport containers-storage \
               --target-imgref ${tag} \
               /output
+          sudo umount /mnt/root/boot/efi
           sudo umount /mnt/root/boot
           sudo umount /mnt/root
           sudo losetup -d ${disk}
