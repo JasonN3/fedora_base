@@ -159,15 +159,15 @@ jobs:
           tag=$(echo ${{ steps.meta.outputs.tags }} | awk '{print $1}')
           truncate -s 10G output/arm64.raw
           parted output/arm64.raw mklabel msdos
-          parted output/arm64.raw mkpart primary fat16 9437kB 535MB
+          parted output/arm64.raw mkpart primary fat16 1MiB 535MB
           parted output/arm64.raw set 1 boot on
           parted output/arm64.raw mkpart primary ext4 535MB 1609MB
           parted output/arm64.raw mkpart primary ext4 1609MB 4302MB
           parted output/arm64.raw print
-          disk=$(losetup --show -P -f output/arm64.raw)
-          mkfs.vfat ${disk}p1
-          mkfs.ext4 ${disk}p2
-          mkfs.xfs ${disk}p3
+          disk=$(sudo losetup --show -P -f output/arm64.raw)
+          sudo mkfs.vfat ${disk}p1
+          sudo mkfs.ext4 ${disk}p2
+          sudo mkfs.xfs ${disk}p3
           sudo mkdir -p /mnt/root
           sudo mount ${disk}p3 /mnt/root
           sudo mkdir /mnt/root/boot
@@ -186,9 +186,9 @@ jobs:
               --target-transport containers-storage \
               --target-imgref ${tag} \
               /output
-          umount /mnt/root/boot
-          umount /mnt/root
-          losetup -d ${disk}
+          sudo umount /mnt/root/boot
+          sudo umount /mnt/root
+          sudo losetup -d ${disk}
           #truncate -s 10G output/arm64-moved.raw
           #disk=$(losetup --show -P -f output/arm64.raw)
           #disk2=$(losetup --show -f output/arm64-moved.raw)
