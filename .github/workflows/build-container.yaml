@@ -126,12 +126,13 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           username: ${{ github.actor }}
           password: ${{ github.token }}
-  
+
   make-raw:
     name: Create Raw Image
     runs-on: ubuntu-24.04-arm
     needs: build-container
     permissions:
+      actions: write
       packages: write
     steps:
       - name: Docker meta
@@ -152,22 +153,25 @@ jobs:
           tag=$(echo ${{ steps.meta.outputs.tags }} | awk '{print $1}')
           echo "Pulling ${tag}-arm64"
           podman pull ${tag}-arm64
-      
+
       - name: Create Image
         run: |
+          set -euxo pipefail
           mkdir output
           tag=$(echo ${{ steps.meta.outputs.tags }} | awk '{print $1}')
-          truncate -s 10G output/arm64.raw
-          parted output/arm64.raw mklabel gpt
+          rootfs=xfs
+          bootfs=ext4
+          truncate -s 5G output/arm64.raw
+          parted output/arm64.raw mklabel msdos
           parted output/arm64.raw mkpart primary fat16 1MiB 535MB
           parted output/arm64.raw set 1 boot on
-          parted output/arm64.raw mkpart primary ext4 535MB 1609MB
-          parted output/arm64.raw mkpart primary ext4 1609MB 4302MB
+          parted output/arm64.raw mkpart primary ${bootfs} 535MB 1609MB
+          parted output/arm64.raw mkpart primary ${rootfs} 1609MB 100%
           parted output/arm64.raw print
           disk=$(sudo losetup --show -P -f output/arm64.raw)
           sudo mkfs.vfat -F 32 ${disk}p1
-          sudo mkfs.ext4 ${disk}p2
-          sudo mkfs.xfs ${disk}p3
+          sudo mkfs.${bootfs} ${disk}p2
+          sudo mkfs.${rootfs} -L root ${disk}p3
           sudo mkdir -p /mnt/root
           sudo mount ${disk}p3 /mnt/root
           sudo mkdir /mnt/root/boot
@@ -192,11 +196,6 @@ jobs:
           sudo umount /mnt/root/boot
           sudo umount /mnt/root
           sudo losetup -d ${disk}
-          #truncate -s 10G output/arm64-moved.raw
-          #disk=$(losetup --show -P -f output/arm64.raw)
-          #disk2=$(losetup --show -f output/arm64-moved.raw)
-          #parted ${disk2} mklabel gpt
-          #parted ${disk2} mkpart 
           echo "Compressing image..."
           xz -z output/arm64.raw
 
