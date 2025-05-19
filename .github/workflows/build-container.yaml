@@ -165,7 +165,7 @@ jobs:
           parted output/arm64.raw mkpart primary ext4 1609MB 4302MB
           parted output/arm64.raw print
           disk=$(sudo losetup --show -P -f output/arm64.raw)
-          sudo mkfs.vfat ${disk}p1
+          sudo mkfs.vfat -F 32 ${disk}p1
           sudo mkfs.ext4 ${disk}p2
           sudo mkfs.xfs ${disk}p3
           sudo mkdir -p /mnt/root
