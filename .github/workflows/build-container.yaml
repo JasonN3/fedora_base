@@ -158,8 +158,7 @@ jobs:
           mkdir output
           tag=$(echo ${{ steps.meta.outputs.tags }} | awk '{print $1}')
           truncate -s 10G output/arm64.raw
-          podman run \
-            -it \
+          sudo podman run \
             --rm \
             --privileged \
             --pid=host \
