@@ -16,7 +16,7 @@ RUN dnf install -y tmux && \
 
 # Install packages for OIDC authentication
 RUN dnf copr enable -y sbose/sssd-idp && \
-    dnf install -y authselect chrony oddjobd sssd-idp  && \
+    dnf install -y authselect chrony oddjobd oddjob-mkhomedir sssd-idp  && \
     dnf clean all && \
     systemctl enable sssd oddjobd && \
     authselect select sssd with-mkhomedir && \
