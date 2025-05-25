@@ -19,7 +19,8 @@ RUN dnf copr enable -y sbose/sssd-idp && \
     dnf install -y authselect chrony oddjobd sssd-idp  && \
     dnf clean all && \
     systemctl enable sssd oddjobd && \
-    authselect select sssd with-mkhomedir
+    authselect select sssd with-mkhomedir && \
+    chgrp sssd /usr/libexec/sssd/sssd_pam
 
 # Don't reboot unexpectedly
 RUN rm -f /usr/lib/systemd/system/default.target.wants/bootc-fetch-apply-updates.timer
