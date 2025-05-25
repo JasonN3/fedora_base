@@ -3,7 +3,7 @@ FROM quay.io/fedora/fedora-bootc:41
 # Install and enable flightctl-agent
 RUN dnf install -y dnf5-plugins && \
     dnf copr enable -y @redhat-et/flightctl && \
-    dnf install -y flightctl-agent && \
+    dnf install -y flightctl-agent podman && \
     dnf clean all && \
     systemctl enable flightctl-agent.service
 
@@ -11,7 +11,8 @@ RUN dnf install -y dnf5-plugins && \
 COPY rootfs/ /
 
 # Install useful packages
-RUN dnf install -y tmux && dnf clean all
+RUN dnf install -y tmux && \
+    dnf clean all
 
 # Install packages for OIDC authentication
 RUN dnf copr enable -y sbose/sssd-idp && \
