@@ -18,7 +18,7 @@ RUN dnf install -y tmux && \
 RUN dnf copr enable -y sbose/sssd-idp && \
     dnf install -y authselect chrony oddjobd sssd-idp  && \
     dnf clean all && \
-    systemctl enable oddjobd && \
+    systemctl enable sssd oddjobd && \
     authselect select sssd with-mkhomedir
 
 # Don't reboot unexpectedly
