@@ -11,10 +11,7 @@ RUN dnf install -y dnf5-plugins && \
 COPY rootfs/ /
 
 # Install useful packages
-RUN dnf install -y vault python3-hvac ansible-core tmux && dnf clean all
-
-# Install Ansible Collections needed for playbooks
-RUN ansible-galaxy collection install -r /usr/libexec/config/requirements.yaml -p /usr/share/ansible/collections
+RUN dnf install -y tmux && dnf clean all
 
 # Install packages for OIDC authentication
 RUN dnf copr enable -y sbose/sssd-idp && \
