@@ -7,17 +7,21 @@ RUN dnf install -y dnf5-plugins && \
     dnf clean all && \
     systemctl enable flightctl-agent.service
 
+# Copy files from repo
 COPY rootfs/ /
 
+# Install useful packages
 RUN dnf install -y vault python3-hvac ansible-core tmux && dnf clean all
 
+# Install Ansible Collections needed for playbooks
 RUN ansible-galaxy collection install -r /usr/libexec/config/requirements.yaml -p /usr/share/ansible/collections
 
-# Install packages for domain joining
-RUN dnf install -y chrony krb5-workstation \
-        samba-common-tools oddjob-mkhomedir samba-common \
-        sssd authselect && \
-    dnf clean all
+# Install packages for OIDC authentication
+RUN dnf copr enable -y sbose/sssd-idp && \
+    dnf install -y authselect chrony oddjobd sssd-idp  && \
+    dnf clean all && \
+    systemctl enable oddjobd && \
+    authselect select sssd --with-mkhomedir
 
 # Don't reboot unexpectedly
 RUN rm -f /usr/lib/systemd/system/default.target.wants/bootc-fetch-apply-updates.timer
