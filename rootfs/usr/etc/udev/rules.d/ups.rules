@@ -1,0 +1,2 @@
+# EF-UPS-DELTA 
+ACTION=="add", SUBSYSTEM=="usb", ATTRS{idVendor}=="3746", ATTRS{idProduct}=="ffff", MODE="0666", SYMLINK+="ups"
