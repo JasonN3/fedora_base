@@ -20,7 +20,8 @@ RUN dnf copr enable -y sbose/sssd-idp && \
     dnf clean all && \
     systemctl enable sssd oddjobd && \
     authselect select sssd with-mkhomedir && \
-    chgrp sssd /usr/libexec/sssd/sssd_pam
+    chgrp sssd /usr/libexec/sssd/sssd_pam && \
+    sed -i 's/^ChallengeResponseAuthentication .*/ChallengeResponseAuthentication yes/' /etc/ssh/sshd_config.d/50-redhat.conf
 
 # Don't reboot unexpectedly
 RUN rm -f /usr/lib/systemd/system/default.target.wants/bootc-fetch-apply-updates.timer
