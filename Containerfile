@@ -26,8 +26,10 @@ RUN dnf copr enable -y sbose/sssd-idp && \
 # Don't reboot unexpectedly
 RUN rm -f /usr/lib/systemd/system/default.target.wants/bootc-fetch-apply-updates.timer
 
-# Copy users and groups from packages
-RUN cp /etc/passwd /usr/etc/passwd && \
-    cp /etc/group /usr/etc/group
+# Cleanup
+RUN rm -Rf /var/log/dnf5* \
+           /var/cache/libdnf5 \
+           /var/lib/dnf \
+
 
 RUN bootc container lint
