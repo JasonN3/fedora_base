@@ -29,3 +29,5 @@ RUN rm -f /usr/lib/systemd/system/default.target.wants/bootc-fetch-apply-updates
 # Copy users and groups from packages
 RUN cp /etc/passwd /usr/etc/passwd && \
     cp /etc/group /usr/etc/group
+
+RUN bootc container lint
