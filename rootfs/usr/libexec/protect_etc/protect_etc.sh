@@ -8,12 +8,20 @@ set -euo pipefail
 ## /etc/protect_etc/files.include = Files to include from syncing
 ## Processes exclude and then include
 
-# Get a list of modified files
-ostree admin config-diff | grep ^M | sed 's/^\w*\ *//' > /tmp/modified_files
-
 # Filter out comments
-grep -v '^\s*#' /etc/protect_etc/files.exclude > /tmp/files.exclude
-grep -v '^\s*#' /etc/protect_etc/files.include > /tmp/files.include
+if [ -f /etc/protect_etc/files.include ]
+then
+  grep -v '^\s*#' /etc/protect_etc/files.exclude > /tmp/files.exclude
+else
+  touch /tmp/files.exclude
+fi
+
+if [ -f /etc/protect_etc/files.include ]
+then
+  grep -v '^\s*#' /etc/protect_etc/files.include > /tmp/files.include
+else
+  touch /tmp/files.include
+fi
 
 # c = checksum
 # r = recursive
