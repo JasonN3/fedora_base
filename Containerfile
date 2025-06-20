@@ -10,6 +10,9 @@ RUN dnf install -y dnf5-plugins && \
 # Copy files from repo
 COPY rootfs/ /
 
+# Enable services
+RUN systemctl enable protect_etc.service
+
 # Install useful packages
 RUN dnf install -y tmux which rsync && \
     dnf clean all
