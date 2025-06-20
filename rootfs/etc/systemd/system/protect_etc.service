@@ -1,0 +1,14 @@
+[Unit]
+Description=Resets files in /etc so they stay up to date with the image
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/libexec/protect_etc/protect_etc.sh
+PrivateTmp=true
+ReadWritePaths=/etc
+ReadOnlyPaths=/
+ExecPaths=/usr/libexec/protect_etc/protect_etc.sh
+
+[Install]
+WantedBy=multi-user.target

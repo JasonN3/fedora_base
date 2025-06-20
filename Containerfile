@@ -11,7 +11,7 @@ RUN dnf install -y dnf5-plugins && \
 COPY rootfs/ /
 
 # Install useful packages
-RUN dnf install -y tmux which && \
+RUN dnf install -y tmux which rsync && \
     dnf clean all
 
 # Install packages for OIDC authentication
