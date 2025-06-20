@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 ## Syncs files from /usr/etc back to /etc so future updates can update the files
 ## 
@@ -11,8 +12,8 @@
 ostree admin config-diff | grep ^M | sed 's/^\w*\ *//' > /tmp/modified_files
 
 # Filter out comments
-grep -v '^\s*#' /etc/files.exclude > /tmp/files.exclude
-grep -v '^\s*#' /etc/files.include > /tmp/files.include
+grep -v '^\s*#' /etc/protect_etc/files.exclude > /tmp/files.exclude
+grep -v '^\s*#' /etc/protect_etc/files.include > /tmp/files.include
 
 # c = checksum
 # r = recursive
