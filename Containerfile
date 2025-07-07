@@ -26,6 +26,7 @@ RUN dnf install -y authselect chrony oddjobd oddjob-mkhomedir sssd-idp  && \
     authselect select sssd with-mkhomedir && \
     chgrp sssd /usr/libexec/sssd/sssd_pam && \
     sed -i 's/^ChallengeResponseAuthentication .*/ChallengeResponseAuthentication yes/' /etc/ssh/sshd_config.d/50-redhat.conf
+    sed -i 's/^KbdInteractiveAuthentication .*/KbdInteractiveAuthentication yes/' /etc/ssh/sshd_config.d/50-redhat.conf
 
 # Don't reboot unexpectedly
 RUN rm -f /usr/lib/systemd/system/default.target.wants/bootc-fetch-apply-updates.timer
