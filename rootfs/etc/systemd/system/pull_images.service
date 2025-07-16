@@ -1,0 +1,6 @@
+[Unit]
+Description=Pulls encrypted images for Flightctl
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /usr/libexec/pull_images/pull_images.sh

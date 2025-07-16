@@ -13,7 +13,7 @@ RUN dnf install -y dnf5-plugins && \
 COPY rootfs/ /
 
 # Enable services
-RUN systemctl enable protect_etc.service
+RUN systemctl enable protect_etc.service pull_images.path
 
 # Install useful packages
 RUN dnf install -y tmux which rsync && \

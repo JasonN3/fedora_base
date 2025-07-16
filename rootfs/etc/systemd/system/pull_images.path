@@ -1,0 +1,8 @@
+[Unit]
+Description=Watches for Flightctl updates
+
+[Path]
+PathChanged=/var/lib/flightctl/desired.json
+
+[Install]
+WantedBy=multi-user.target
