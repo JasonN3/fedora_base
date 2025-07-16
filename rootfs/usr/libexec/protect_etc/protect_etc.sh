@@ -11,14 +11,14 @@ set -euo pipefail
 # Filter out comments
 if [ -f /etc/protect_etc/files.include ]
 then
-  grep -v '^\s*#' /etc/protect_etc/files.exclude > /tmp/files.exclude
+  grep -v '^\s*#' /etc/protect_etc/files.exclude > /tmp/files.exclude || touch /tmp/files.exclude
 else
   touch /tmp/files.exclude
 fi
 
 if [ -f /etc/protect_etc/files.include ]
 then
-  grep -v '^\s*#' /etc/protect_etc/files.include > /tmp/files.include
+  grep -v '^\s*#' /etc/protect_etc/files.include > /tmp/files.include || touch /tmp/files.include
 else
   touch /tmp/files.include
 fi
