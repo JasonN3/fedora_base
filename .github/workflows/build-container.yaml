@@ -129,7 +129,17 @@ jobs:
 
   make-raw:
     name: Create Raw Image
-    runs-on: ubuntu-24.04-arm
+    strategy:
+      matrix:
+        os:
+          - ubuntu-24.04
+          - ubuntu-24.04-arm
+        include:
+          - os: ubuntu-24.04
+            arch: amd64
+          - os: ubuntu-24.04-arm
+            arch: arm64
+    runs-on: ${{ matrix.os }}
     needs: build-container
     permissions:
       actions: write
@@ -151,8 +161,8 @@ jobs:
       - name: Pull image
         run: |
           tag=$(echo "${{ steps.meta.outputs.tags }}" | awk '{print $1}')
-          echo "Pulling ${tag}-arm64"
-          sudo podman pull ${tag}-arm64
+          echo "Pulling ${tag}-${{ matrix.arch }}"
+          sudo podman pull ${tag}-${{ matrix.arch }}
 
       - name: Create Image
         run: |
@@ -161,14 +171,14 @@ jobs:
           tag=$(echo "${{ steps.meta.outputs.tags }}" | awk '{print $1}')
           rootfs=xfs
           bootfs=ext4
-          truncate -s 5G output/arm64.raw
-          parted output/arm64.raw mklabel msdos
-          parted output/arm64.raw mkpart primary fat16 9MiB 501MiB
-          parted output/arm64.raw set 1 boot on
-          parted output/arm64.raw mkpart primary ${bootfs} 510MiB 1GiB
-          parted output/arm64.raw mkpart primary ${rootfs} 1534MB 100%
-          parted output/arm64.raw print
-          disk=$(sudo losetup --show -P -f output/arm64.raw)
+          truncate -s 5G output/${{ matrix.arch }}.raw
+          parted output/${{ matrix.arch }}.raw mklabel msdos
+          parted output/${{ matrix.arch }}.raw mkpart primary fat16 9MiB 501MiB
+          parted output/${{ matrix.arch }}.raw set 1 boot on
+          parted output/${{ matrix.arch }}.raw mkpart primary ${bootfs} 510MiB 1GiB
+          parted output/${{ matrix.arch }}.raw mkpart primary ${rootfs} 1534MB 100%
+          parted output/${{ matrix.arch }}.raw print
+          disk=$(sudo losetup --show -P -f output/${{ matrix.arch }}.raw)
           sudo mkfs.vfat -F 32 ${disk}p1
           sudo mkfs.${bootfs} ${disk}p2
           sudo mkfs.${rootfs} -L root ${disk}p3
@@ -186,7 +196,7 @@ jobs:
             -v /dev:/dev \
             -v /var/lib/containers:/var/lib/containers \
             -v /mnt/root:/output \
-            ${tag}-arm64 \
+            ${tag}-${{ matrix.arch }} \
             bootc install to-filesystem \
               --generic-image \
               --target-transport containers-storage \
@@ -197,7 +207,7 @@ jobs:
           sudo umount /mnt/root
           sudo losetup -d ${disk}
           echo "Compressing image..."
-          xz -vz -T0 output/arm64.raw
+          xz -vz -T0 output/${{ matrix.arch }}.raw
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
