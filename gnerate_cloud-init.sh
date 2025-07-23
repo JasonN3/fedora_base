@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 # Prompt for admin user
 admin_user=""
@@ -10,7 +11,7 @@ done
 
 # Prompt for auth method
 auth_method=0
-while [[ ! "${auth_method}" =~ [123] ]]
+while [[ ! "${auth_method}" =~ ^[1-3]$ ]]
 do
   echo "How will that user to authenticate:"
   echo "1 - Password"
@@ -21,14 +22,14 @@ do
 done
 
 # Password auth
-if [[ $(( auth_method & 1 )) != 0 ]]
+if (( auth_method & 1 ))
 then
   echo "Enter the password for ${admin_user}"
   admin_hash=$(mkpasswd)
 fi
 
 # SSH auth
-if [[ $(( auth_method & 2 )) != 0 ]]
+if (( auth_method & 2 ))
 then
   admin_key=""
   while [[ ${admin_key} == "" ]]
@@ -39,11 +40,6 @@ then
 fi
 
 base64_file=$(flightctl certificate request | base64 -w0)
-if [[ $? != 0 ]]
-then
-    echo "Error generating flightctl config"
-    exit 1
-fi
 
 echo "Writing cloud-init.yaml"
 cat << EOF > cloud-init.yaml
@@ -59,7 +55,7 @@ users:
     gecos: ${admin_user}
 EOF
 # Appending password auth
-if [[ $(( auth_method & 1 )) != 0 ]]
+if (( auth_method & 1 ))
 then
 cat << EOF >> cloud-init.yaml
     sudo: ["ALL=(ALL) ALL"]
@@ -72,7 +68,7 @@ EOF
 fi
 
 # Appending SSH auth
-if [[ $(( auth_method & 2 )) != 0 ]]
+if (( auth_method & 2 ))
 then
 cat << EOF >> cloud-init.yaml
     ssh_authorized_keys:
