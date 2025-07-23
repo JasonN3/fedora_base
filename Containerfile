@@ -12,12 +12,12 @@ RUN dnf install -y dnf5-plugins && \
 # Copy files from repo
 COPY rootfs/ /
 
-# Enable services
-RUN systemctl enable protect_etc.service pull_images.path
-
 # Install useful packages
-RUN dnf install -y tmux which rsync && \
+RUN dnf install -y cloud-init tmux which rsync && \
     dnf clean all
+
+# Enable services
+RUN systemctl enable protect_etc.service pull_images.path cloud-init.target
 
 # Install packages for OIDC authentication
 RUN dnf install -y authselect chrony oddjobd oddjob-mkhomedir sssd-idp  && \
