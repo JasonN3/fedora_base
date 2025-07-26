@@ -34,7 +34,6 @@ RUN rm -f /usr/lib/systemd/system/default.target.wants/bootc-fetch-apply-updates
 # Cleanup
 RUN rm -Rf /var/log/dnf5* \
            /var/cache/libdnf5 \
-           /var/lib/dnf \
            /var/cache/ldconfig/aux-cache
 
 
