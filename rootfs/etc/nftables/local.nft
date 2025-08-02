@@ -1,6 +1,0 @@
-table inet ssh {
-  chain INPUT {
-    type filter hook input priority filter
-    policy accept
-    
-  }
