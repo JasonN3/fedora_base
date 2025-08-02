@@ -1,0 +1,5 @@
+table inet nftables {
+  chain INPUT {
+    tcp dport 22 accept        # SSH
+  }
+}

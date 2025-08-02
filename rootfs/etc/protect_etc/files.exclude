@@ -1,5 +1,7 @@
 shadow
 machine-id
+nftables/local.nft.d
 selinux
 ssh/sshd_config
 sssd/sssd.conf
+sssd/conf.d

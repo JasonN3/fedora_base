@@ -17,7 +17,10 @@ RUN dnf install -y cloud-init tmux which rsync && \
     dnf clean all
 
 # Enable services
-RUN systemctl enable protect_etc.service pull_images.path cloud-init.target
+RUN systemctl enable nftables.service \
+                     protect_etc.service \
+                     pull_images.path \
+                     cloud-init.target
 
 # Install packages for OIDC authentication
 RUN dnf install -y authselect chrony oddjobd oddjob-mkhomedir sssd-idp  && \

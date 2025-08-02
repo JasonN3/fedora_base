@@ -2,8 +2,10 @@
 
 # Base Fedora Image
 
-This repo is meant as an example of what is possible with Image Mode. This repo contains no secrets and instead uses a SystemD service to configure the system on startup. The packages required for the configuration are built into the container image. This allows for publicly stored images while still allowing secure information to be stored on the resulting machine.
+This repo is meant as an example of what is possible with Image Mode. This repo contains no secrets and instead uses a separate repo for any configuration information. The last layer that contains the generated configurations is then encrypted so it can only be read by the desired machines.
 
-Under normal circumstances, the preferred approach is to store all of your configurations in their final state within the container image, but that will not always be an option
+To ensure that none of the base OS is modified in an unexpected way, the service `protect_etc` was created to reset any files that do not match the base image. Files can be excluded by listing them in `/etc/protect_etc/files.exclude`
 
-The resulting image is the baseline image for my OS images. From there, [Fedora Workstation](https://github.com/JasonN3/fedora_workstation) and [Fedora Server](https://github.com/JasonN3/fedora_server) are created. If you would like to create something similar for yourself, please feel free to fork the repo.
+Any applications that need to run on the system are then launched using podman either as a systemd service or through flightctl.
+
+If you would like to create something similar for yourself, please feel free to fork the repo.

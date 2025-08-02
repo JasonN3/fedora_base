@@ -1,0 +1,36 @@
+flush ruleset
+
+# Make the firewall stateful, but leave the filtering to additional tables
+table inet nftables {
+  chain INPUT {
+    type filter hook input priority filter - 20
+    policy accept
+    ct state vmap { established : accept, related : accept, invalid : drop }
+  }
+
+  chain FORWARD {
+    type filter hook forward priority filter - 20
+    policy accept
+    ct state vmap { established : accept, related : accept, invalid : drop }
+  }
+
+  chain POSTROUTING {
+    type nat hook postrouting priority srcnat - 20
+    policy accept
+  }
+
+  chain PREROUTING {
+    type nat hook prerouting priority dstnat - 20
+    policy accept
+  }
+
+  chain OUTPUT {
+    type nat hook output priority dstnat - 20
+    policy accept
+  }
+}
+
+# As long as the same table and chain names are used, the only traffic left will be new packets
+# Files are loaded in alphabetical order
+
+include /etc/nftables/local.nft.d/
