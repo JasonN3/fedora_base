@@ -9,7 +9,7 @@ table inet nftables {
   }
 
   chain FORWARD {
-    type filter hook input priority filter - 20
+    type filter hook forward priority filter - 20
     policy accept
     ct state vmap { established : accept, related : accept, invalid : drop }
   }
