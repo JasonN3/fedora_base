@@ -13,6 +13,19 @@ on:
     - cron: "0 7 8-14 * 2"
 
 jobs:
+  tests:
+    name: Run Bats Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Bats
+        uses: bats-core/bats-action@v2
+
+      - name: Run Bats Tests
+        run: bats -r tests
+
   build-container:
     strategy:
       matrix:
@@ -25,6 +38,7 @@ jobs:
           - os: ubuntu-24.04-arm
             arch: arm64
     name: Build Container Image
+    needs: tests
     runs-on: ${{ matrix.os }}
     permissions:
       contents: read

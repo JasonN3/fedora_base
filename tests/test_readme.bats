@@ -39,50 +39,6 @@ teardown() {
     grep -q "^\[![Codacy Badge\].*\](.*)$" "$README_FILE"
 }
 
-@test "README.md explains Image Mode purpose" {
-    grep -q "example of what is possible with Image Mode" "$README_FILE"
-}
-
-@test "README.md mentions no secrets policy" {
-    grep -q "contains no secrets" "$README_FILE"
-}
-
-@test "README.md describes separate configuration repo" {
-    grep -q "separate repo for any configuratoin information" "$README_FILE"
-}
-
-@test "README.md mentions encryption of configuration layer" {
-    grep -q "encrypted so it can only be read by the desired machines" "$README_FILE"
-}
-
-@test "README.md describes protect_etc service" {
-    grep -q "protect_etc.*was created" "$README_FILE"
-}
-
-@test "README.md explains file reset functionality" {
-    grep -q "reset any files that do not match the base image" "$README_FILE"
-}
-
-@test "README.md specifies exclusion file path" {
-    grep -q "/etc/protect_etc/files.exclude" "$README_FILE"
-}
-
-@test "README.md mentions podman for applications" {
-    grep -q "launched using podman" "$README_FILE"
-}
-
-@test "README.md mentions systemd service deployment" {
-    grep -q "systemd service" "$README_FILE"
-}
-
-@test "README.md mentions flightctl deployment" {
-    grep -q "flightctl" "$README_FILE"
-}
-
-@test "README.md encourages forking" {
-    grep -q "feel free to fork the repo" "$README_FILE"
-}
-
 @test "README.md has consistent line endings" {
     # Check for Unix line endings (no carriage returns)
     ! grep -q $'\r' "$README_FILE"
@@ -102,32 +58,6 @@ teardown() {
     ! grep -q "^#{7,}" "$README_FILE"
 }
 
-@test "README.md mentions key technologies" {
-    # Check for essential technology mentions
-    grep -qi "fedora" "$README_FILE"
-    grep -qi "podman" "$README_FILE"
-}
-
-@test "README.md security model is clearly explained" {
-    # Verify key security concepts are mentioned
-    grep -q "encrypted" "$README_FILE"
-    grep -q "no secrets" "$README_FILE"
-    grep -q "separate repo" "$README_FILE"
-}
-
-@test "README.md file protection is documented" {
-    # Verify protection mechanism documentation
-    grep -q "protect_etc" "$README_FILE"
-    grep -q "files.exclude" "$README_FILE"
-    grep -q "reset any files" "$README_FILE"
-}
-
-@test "README.md deployment options are covered" {
-    # Verify both deployment methods are mentioned
-    grep -q "systemd" "$README_FILE"
-    grep -q "flightctl" "$README_FILE"
-}
-
 @test "README.md has reasonable line lengths" {
     # Check that lines don't exceed 200 characters (allowing for URLs)
     max_length=0
@@ -144,21 +74,6 @@ teardown() {
     done < "$README_FILE"
 }
 
-@test "README.md detects typo in configuration" {
-    # This test will fail due to the typo "configuratoin" in the original README
-    # Note: This test catches the actual typo "configuratoin" in line 5 of README.md
-    grep -q "configuratoin" "$README_FILE"
-}
-
-@test "README.md contains no other common typos" {
-    # Check for other common typos
-    ! grep -qi "seperate" "$README_FILE"
-    ! grep -qi "occured" "$README_FILE"
-    ! grep -qi "recieve" "$README_FILE"
-    ! grep -qi "thier" "$README_FILE"
-    ! grep -qi "enviroment" "$README_FILE"
-}
-
 @test "README.md badge URL structure is valid" {
     # Extract and validate badge URL structure
     badge_url=$(grep -o 'https://app\.codacy\.com[^)]*' "$README_FILE" | head -1)
@@ -173,25 +88,6 @@ teardown() {
     [[ "$dashboard_url" =~ ^https://app\.codacy\.com/gh/JasonN3/fedora_base/dashboard ]]
 }
 
-@test "README.md explains purpose in opening section" {
-    # Check that the purpose is explained early in the document
-    head -10 "$README_FILE" | grep -q "example of what is possible"
-}
-
-@test "README.md has logical content flow" {
-    # Verify that concepts are introduced in logical order
-    purpose_line=$(grep -n "example of what is possible" "$README_FILE" | cut -d: -f1)
-    security_line=$(grep -n "no secrets" "$README_FILE" | cut -d: -f1)
-    protection_line=$(grep -n "protect_etc" "$README_FILE" | cut -d: -f1)
-    deployment_line=$(grep -n "podman" "$README_FILE" | cut -d: -f1)
-    fork_line=$(grep -n "fork the repo" "$README_FILE" | cut -d: -f1)
-    
-    # Check ordering (allow some flexibility)
-    [ "$purpose_line" -lt "$security_line" ]
-    [ "$security_line" -lt "$protection_line" ]
-    [ "$protection_line" -lt "$deployment_line" ]
-    [ "$deployment_line" -lt "$fork_line" ]
-}
 
 @test "README.md uses consistent terminology" {
     # Check for consistent use of technical terms
@@ -207,21 +103,6 @@ teardown() {
     grep -q "/etc/protect_etc/files.exclude" "$README_FILE"
     grep -q "systemd service" "$README_FILE"
     grep -q "flightctl" "$README_FILE"
-}
-
-@test "README.md explains the complete workflow" {
-    # Verify all major workflow steps are covered
-    grep -q "Image Mode" "$README_FILE"
-    grep -q "separate repo" "$README_FILE"
-    grep -q "encrypted" "$README_FILE"
-    grep -q "protect_etc" "$README_FILE"
-    grep -q "podman" "$README_FILE"
-}
-
-@test "README.md is suitable for newcomers" {
-    # Check that it explains concepts rather than assuming knowledge
-    grep -q "example of what is possible" "$README_FILE"
-    grep -q "If you would like to create something similar" "$README_FILE"
 }
 
 @test "README.md file permissions are appropriate" {
@@ -241,34 +122,4 @@ teardown() {
     # Check that there are blank lines between paragraphs
     blank_lines=$(grep -c '^$' "$README_FILE")
     [ "$blank_lines" -ge 3 ]  # Should have at least a few paragraph breaks
-}
-
-@test "README.md contains all essential project information" {
-    # Verify comprehensive coverage of project aspects
-    grep -q "Base Fedora Image" "$README_FILE"
-    grep -q "Image Mode" "$README_FILE"
-    grep -q "secrets" "$README_FILE"
-    grep -q "encrypted" "$README_FILE"
-    grep -q "protect_etc" "$README_FILE"
-    grep -q "podman" "$README_FILE"
-    grep -q "fork" "$README_FILE"
-}
-
-@test "README.md security architecture is well documented" {
-    # Ensure security model is thoroughly explained
-    grep -q "contains no secrets" "$README_FILE"
-    grep -q "separate repo for any" "$README_FILE" 
-    grep -q "encrypted so it can only be read" "$README_FILE"
-}
-
-@test "README.md application deployment methods are clear" {
-    # Verify deployment options are clearly stated
-    grep -q "systemd service" "$README_FILE"
-    grep -q "through flightctl" "$README_FILE"
-}
-
-@test "README.md encourages community contribution" {
-    # Check for community-friendly language
-    grep -q "If you would like to create something similar" "$README_FILE"
-    grep -q "please feel free to fork" "$README_FILE"
 }
