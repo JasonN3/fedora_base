@@ -1,5 +1,15 @@
 ARG FEDORA_BOOTC_VERSION=43
 
+FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION} as selinux
+
+RUN dnf install -y checkpolicy \
+                   make \
+                   policycoreutils
+
+RUN --mount=source=/selinux,target=/selinux,rw \
+    cd /selinux && \
+    make all
+
 FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION}
 
 # Install and enable flightctl-agent
@@ -23,9 +33,14 @@ RUN systemctl enable nftables.service \
                      cloud-init.target
 
 # Install packages for OIDC authentication
-RUN dnf install -y authselect chrony oddjobd oddjob-mkhomedir sssd-idp  && \
+RUN dnf install -y authselect \
+                   chrony \
+                   oddjobd \
+                   oddjob-mkhomedir \
+                   sssd-idp && \
     dnf clean all && \
-    systemctl enable sssd oddjobd && \
+    systemctl enable sssd \
+                     oddjobd && \
     authselect select sssd with-mkhomedir && \
     chgrp sssd /usr/libexec/sssd/sssd_pam && \
     sed -i 's/^ChallengeResponseAuthentication .*/ChallengeResponseAuthentication yes/' /etc/ssh/sshd_config.d/50-redhat.conf && \

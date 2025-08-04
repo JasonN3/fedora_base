@@ -52,11 +52,6 @@ jobs:
             type=semver,pattern=v{{major}}.{{minor}}
             type=semver,pattern=v{{major}}.{{minor}}.{{patch}}
 
-      - name: Build SELinux files
-        run: |
-          cd selinux
-          make all
-
       - name: Buildah Build
         id: build-image
         uses: redhat-actions/buildah-build@v2
