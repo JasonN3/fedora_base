@@ -8,7 +8,9 @@ RUN dnf install -y checkpolicy \
 
 RUN --mount=source=/selinux,target=/selinux,rw \
     cd /selinux && \
-    make all
+    make all && \
+    mkdir /selinux-pp
+    mv /selinux/*.pp /selinux-pp/
 
 FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION}
 
@@ -49,7 +51,7 @@ RUN dnf install -y authselect \
 # Don't reboot unexpectedly
 RUN rm -f /usr/lib/systemd/system/default.target.wants/bootc-fetch-apply-updates.timer
 
-RUN --mount=source=/selinux,target=/selinux \
+RUN --mount=from=selinux,source=/selinux-pp,target=/selinux \
     if ls /selinux/*.pp 1> /dev/null 2>&1; then \
       for module in /selinux/*.pp; do semodule -i "${module}"; done; \
     fi
