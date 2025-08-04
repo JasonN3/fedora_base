@@ -1,5 +1,17 @@
 ARG FEDORA_BOOTC_VERSION=43
 
+FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION} as selinux
+
+RUN dnf install -y checkpolicy \
+                   make \
+                   policycoreutils
+
+RUN --mount=source=/selinux,target=/selinux,rw \
+    cd /selinux && \
+    make all && \
+    mkdir /selinux-pp && \
+    mv /selinux/*.pp /selinux-pp/
+
 FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION}
 
 # Install and enable flightctl-agent
@@ -23,9 +35,14 @@ RUN systemctl enable nftables.service \
                      cloud-init.target
 
 # Install packages for OIDC authentication
-RUN dnf install -y authselect chrony oddjobd oddjob-mkhomedir sssd-idp  && \
+RUN dnf install -y authselect \
+                   chrony \
+                   oddjobd \
+                   oddjob-mkhomedir \
+                   sssd-idp && \
     dnf clean all && \
-    systemctl enable sssd oddjobd && \
+    systemctl enable sssd \
+                     oddjobd && \
     authselect select sssd with-mkhomedir && \
     chgrp sssd /usr/libexec/sssd/sssd_pam && \
     sed -i 's/^ChallengeResponseAuthentication .*/ChallengeResponseAuthentication yes/' /etc/ssh/sshd_config.d/50-redhat.conf && \
@@ -33,6 +50,11 @@ RUN dnf install -y authselect chrony oddjobd oddjob-mkhomedir sssd-idp  && \
 
 # Don't reboot unexpectedly
 RUN rm -f /usr/lib/systemd/system/default.target.wants/bootc-fetch-apply-updates.timer
+
+RUN --mount=from=selinux,source=/selinux-pp,target=/selinux \
+    if ls /selinux/*.pp 1> /dev/null 2>&1; then \
+      for module in /selinux/*.pp; do semodule -i "${module}"; done; \
+    fi
 
 # Cleanup
 RUN rm -Rf /var/log/dnf5* \
