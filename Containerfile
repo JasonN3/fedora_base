@@ -34,6 +34,9 @@ RUN dnf install -y authselect chrony oddjobd oddjob-mkhomedir sssd-idp  && \
 # Don't reboot unexpectedly
 RUN rm -f /usr/lib/systemd/system/default.target.wants/bootc-fetch-apply-updates.timer
 
+RUN --mount=source=/selinux,target=/selinux \
+    for module in $(ls /selinux/*.pp); do semodule -i ${module}; done
+
 # Cleanup
 RUN rm -Rf /var/log/dnf5* \
            /var/cache/libdnf5 \

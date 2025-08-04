@@ -1,0 +1,10 @@
+module flightctl_sssd_rw 1.0;
+
+require {
+    type flightctl_agent_t;
+    type sssd_conf_t;
+    class file { read write open getattr };
+}
+
+# Grant full read/write access
+allow flightctl_agent_t sssd_conf_t:file { read write open getattr };
