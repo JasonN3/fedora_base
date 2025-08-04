@@ -54,7 +54,7 @@ jobs:
 
       - name: Build SELinux files
         run: |
-          apt install -y make
+          sudo apt install -y make
           cd selinux
           make all
 
