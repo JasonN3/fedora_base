@@ -3,4 +3,4 @@ Description=Fixes nmconnection permssions
 
 [Service]
 Type=oneshot
-ExecStart=/bin/bash -c "chmod go= /etc/NetworkManager/system-connections/*"
+ExecStart=/usr/bin/find /etc/NetworkManager/system-connections -type f -exec chmod go= {} +
