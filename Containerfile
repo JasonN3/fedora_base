@@ -32,6 +32,7 @@ RUN dnf install -y cloud-init tmux which rsync && \
 RUN systemctl enable nftables.service \
                      protect_etc.service \
                      pull_images.path \
+                     fix_perms_nm.path \
                      cloud-init.target
 
 # Install packages for OIDC authentication
@@ -53,7 +54,7 @@ RUN rm -f /usr/lib/systemd/system/default.target.wants/bootc-fetch-apply-updates
 
 RUN --mount=from=selinux,source=/selinux-pp,target=/selinux \
     if ls /selinux/*.pp 1> /dev/null 2>&1; then \
-      for module in /selinux/*.pp; do semodule -i "${module}"; done; \
+      for module in /selinux/*.pp; do semodule -vi "${module}"; done; \
     fi
 
 # Cleanup
