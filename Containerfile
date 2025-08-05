@@ -32,7 +32,7 @@ RUN dnf install -y cloud-init tmux which rsync && \
 RUN systemctl enable nftables.service \
                      protect_etc.service \
                      pull_images.path \
-                     fix_perms_nm.path
+                     fix_perms_nm.path \
                      cloud-init.target
 
 # Install packages for OIDC authentication
