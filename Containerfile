@@ -53,7 +53,7 @@ RUN rm -f /usr/lib/systemd/system/default.target.wants/bootc-fetch-apply-updates
 
 RUN --mount=from=selinux,source=/selinux-pp,target=/selinux \
     if ls /selinux/*.pp 1> /dev/null 2>&1; then \
-      for module in /selinux/*.pp; do semodule -i "${module}"; done; \
+      for module in /selinux/*.pp; do semodule -vi "${module}"; done; \
     fi
 
 # Cleanup
