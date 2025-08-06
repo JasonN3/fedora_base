@@ -33,4 +33,4 @@ table inet nftables {
 # As long as the same table and chain names are used, the only traffic left will be new packets
 # Files are loaded in alphabetical order
 
-include "/etc/nftables/local.nft.d/"
+include "/etc/nftables/local.nft.d/*.nft"
