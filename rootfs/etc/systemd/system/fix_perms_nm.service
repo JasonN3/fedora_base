@@ -1,5 +1,6 @@
 [Unit]
 Description=Fixes nmconnection permssions
+StartLimitIntervalSec=0
 
 [Service]
 Type=oneshot
