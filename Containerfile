@@ -14,14 +14,14 @@ RUN --mount=source=/selinux,target=/selinux,rw \
 
 FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION}
 
-# Install and enable yggdrasil
-# rhc-worker-playbook allows running playbooks from yggdrasil
-RUN dnf install -y podman rhc-worker-playbook yggdrasil && \
-    dnf clean all && \
-    systemctl enable yggdrasil
-
 # Copy files from repo
 COPY rootfs/ /
+
+# Install yggdrasil
+# rhc-worker-playbook allows running playbooks from yggdrasil
+RUN dnf install -y podman yggdrasil && \
+    dnf install --enablerepo=centos -y rhc-worker-playbook && \
+    dnf clean all
 
 # Install useful packages
 RUN dnf install -y cloud-init tmux which rsync && \
@@ -32,7 +32,8 @@ RUN systemctl enable nftables.service \
                      protect_etc.service \
                      pull_images.path \
                      fix_perms_nm.path \
-                     cloud-init.target
+                     cloud-init.target \
+                     yggdrasil.service
 
 # Install packages for OIDC authentication
 RUN dnf install -y authselect \
