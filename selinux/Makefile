@@ -6,7 +6,9 @@ all: $(PP_FILES)
 
 move: $(PP_FILES)
 	if [[ ! -d /selinux-pp ]]; then mkdir /selinux-pp; fi
+ifneq ($(PP_FILES),)
 	mv $(PP_FILES) /selinux-pp/
+endif
 
 %.mod: %.te
 	checkmodule -M -m -o $@ $<
