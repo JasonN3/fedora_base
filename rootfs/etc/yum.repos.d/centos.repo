@@ -1,0 +1,7 @@
+[centos]
+name=CentOS 10 - $basearch
+baseurl=https://mirror.stream.centos.org/10-stream/AppStream/$basearch/os/
+enabled=1
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-Official-SHA256
+includepkgs=rhc-worker-playbook

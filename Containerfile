@@ -14,12 +14,11 @@ RUN --mount=source=/selinux,target=/selinux,rw \
 
 FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION}
 
-# Install and enable flightctl-agent
-RUN dnf install -y dnf5-plugins && \
-    dnf copr enable -y @redhat-et/flightctl && \
-    dnf install -y flightctl-agent podman podman-compose && \
+# Install and enable yggdrasil
+# rhc-worker-playbook allows running playbooks from yggdrasil
+RUN dnf install -y podman rhc-worker-playbook yggdrasil && \
     dnf clean all && \
-    systemctl enable flightctl-agent.service
+    systemctl enable yggdrasil
 
 # Copy files from repo
 COPY rootfs/ /
