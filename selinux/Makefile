@@ -4,6 +4,10 @@ PP_FILES  := $(TE_FILES:.te=.pp)
 
 all: $(PP_FILES)
 
+move: $(PP_FILES)
+	if [[ ! -d /selinux-pp ]]; then mkdir /selinux-pp; fi
+	mv $(PP_FILES) /selinux-pp/
+
 %.mod: %.te
 	checkmodule -M -m -o $@ $<
 
@@ -13,4 +17,4 @@ all: $(PP_FILES)
 clean:
 	rm -f $(MOD_FILES) $(PP_FILES)
 
-.PHONY: all clean
+.PHONY: all clean move

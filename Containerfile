@@ -9,8 +9,7 @@ RUN dnf install -y checkpolicy \
 RUN --mount=source=/selinux,target=/selinux,rw \
     cd /selinux && \
     make all && \
-    mkdir /selinux-pp && \
-    mv /selinux/*.pp /selinux-pp/
+    make move
 
 FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION}
 
