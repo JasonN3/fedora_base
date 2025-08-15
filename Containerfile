@@ -7,7 +7,7 @@ COPY external/insights-ansible-playbook-verifier /iapv
 RUN dnf install -y python3 python3-setuptools && \
     dnf clean all && \
     cd /iapv && \
-    mkdir /iapv/root && \
+    mkdir -p /iapv/root && \
     python3 setup.py install \
         --prefix=/iapv/root \
         --install-scripts=/iapv/root/usr/bin \
@@ -51,8 +51,6 @@ COPY --from=rwp /rwp/root/ /
 COPY rootfs/. /
 
 # Install yggdrasil
-# insights-client allows verifying the GPG key of the playbook
-# rhc-worker-playbook allows running playbooks from yggdrasil
 RUN dnf install -y podman yggdrasil && \
     dnf clean all
 
