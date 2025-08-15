@@ -9,7 +9,11 @@ RUN python3 -m venv /build && \
     pip install setuptools && \
     cd /iapv && \
     mkdir /iapv/root && \
-    python3 setup.py install --prefix=/iapv/root
+    python3 setup.py install \
+        --prefix=/iapv/root \
+        --install-scripts=/iapv/root/usr/bin \
+        --install-lib=/iapv/root/usr/lib && \
+    ls -l /iapv/root/
 
 FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION} as rwp
 
@@ -22,9 +26,14 @@ RUN dnf install -y 'pkgconfig(yggdrasil)' 'pkgconfig(dbus-1)' 'pkgconfig(systemd
 
 RUN mkdir /rwp/root && \
     cd /rwp && \
-    meson build . -Dprefix=/rwp/root && \
+    meson build . \
+        -Dprefix=/rwp/root \
+        -Dlibdir=/usr/lib64 \
+        -Dlibexecdir=/usr/libexec \
+        -Ddatadir=/usr/share && \
     cd build && \
-    meson install
+    meson install && \
+    ls -l /rwp/root/
 
 FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION} as selinux
 
@@ -40,19 +49,15 @@ RUN --mount=source=/selinux,target=/selinux,rw \
 FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION}
 
 # Copy files from repo
-RUN ls /bin
+RUN ls -l /usr
 COPY --from=iapv /iapv/root/ /
-RUN ls /bin
-COPY --from=rwp  /rwp/root/ /
-RUN ls /bin
-COPY rootfs/ /
-RUN ls /bin
+COPY --from=rwp /rwp/root/ /
+COPY rootfs/. /
 
 # Install yggdrasil
 # insights-client allows verifying the GPG key of the playbook
 # rhc-worker-playbook allows running playbooks from yggdrasil
 RUN dnf install -y podman yggdrasil && \
-    dnf install --enablerepo=centos-baseos,centos-appstream -y insights-client rhc-worker-playbook && \
     dnf clean all
 
 # Install useful packages
