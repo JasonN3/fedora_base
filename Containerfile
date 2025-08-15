@@ -7,7 +7,24 @@ COPY external/insights-ansible-playbook-verifier /iapv
 RUN python3 -m venv /build && \
     source /build/bin/activate && \
     pip install setuptools && \
-    python3 /iapv/setup.py build
+    cd /iapv && \
+    mkdir /iapv/root && \
+    python3 setup.py install --prefix=/iapv/root
+
+FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION} as rwp
+
+COPY external/rhc-worker-playbook /rwp
+
+ENV GOCACHE /var/gocache
+ENV GOMODCACHE /var/gomodcache
+
+RUN dnf install -y 'pkgconfig(yggdrasil)' 'pkgconfig(dbus-1)' 'pkgconfig(systemd)' ansible-galaxy go meson tree cmake python3-pip
+
+RUN mkdir /rwp/root && \
+    cd /rwp && \
+    meson build . -Dprefix=/rwp/root && \
+    cd build && \
+    meson install
 
 FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION} as selinux
 
@@ -23,7 +40,13 @@ RUN --mount=source=/selinux,target=/selinux,rw \
 FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION}
 
 # Copy files from repo
+RUN ls /bin
+COPY --from=iapv /iapv/root/ /
+RUN ls /bin
+COPY --from=rwp  /rwp/root/ /
+RUN ls /bin
 COPY rootfs/ /
+RUN ls /bin
 
 # Install yggdrasil
 # insights-client allows verifying the GPG key of the playbook
