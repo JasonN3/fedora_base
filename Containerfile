@@ -1,5 +1,14 @@
 ARG FEDORA_BOOTC_VERSION=43
 
+FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION} as iapv
+
+COPY external/insights-ansible-playbook-verifier /iapv
+
+RUN python3 -m venv /build && \
+    source /build/bin/activate && \
+    pip install setuptools && \
+    python3 /iapv/setup.py build
+
 FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION} as selinux
 
 RUN dnf install -y checkpolicy \

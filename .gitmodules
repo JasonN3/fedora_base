@@ -1,0 +1,9 @@
+[submodule "rhc-worker-playbook"]
+	path = rhc-worker-playbook
+	url = https://github.com/RedHatInsights/rhc-worker-playbook.git
+[submodule "external/insights-ansible-playbook-verifier"]
+	path = external/insights-ansible-playbook-verifier
+	url = https://github.com/RedHatInsights/insights-ansible-playbook-verifier.git
+[submodule "external/rhc-worker-playbook"]
+	path = external/rhc-worker-playbook
+	url = https://github.com/RedHatInsights/rhc-worker-playbook.git
