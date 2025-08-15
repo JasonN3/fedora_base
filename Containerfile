@@ -19,8 +19,8 @@ COPY rootfs/ /
 # Install yggdrasil
 # insights-client allows verifying the GPG key of the playbook
 # rhc-worker-playbook allows running playbooks from yggdrasil
-RUN dnf install -y podman python3.12 yggdrasil && \
-    dnf install --enablerepo=centos -y insights-client rhc-worker-playbook && \
+RUN dnf install -y podman yggdrasil && \
+    dnf install --enablerepo=centos-baseos,centos-appstream -y insights-client rhc-worker-playbook && \
     dnf clean all
 
 # Install useful packages
