@@ -12,8 +12,7 @@ RUN python3 -m venv /build && \
     python3 setup.py install \
         --prefix=/iapv/root \
         --install-scripts=/iapv/root/usr/bin \
-        --install-lib=/iapv/root/usr/lib && \
-    ls -l /iapv/root/
+        --install-lib=/iapv/root/usr/lib
 
 FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION} as rwp
 
@@ -32,8 +31,7 @@ RUN mkdir /rwp/root && \
         -Dlibexecdir=/usr/libexec \
         -Ddatadir=/usr/share && \
     cd build && \
-    meson install && \
-    ls -l /rwp/root/
+    meson install
 
 FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION} as selinux
 
@@ -49,7 +47,6 @@ RUN --mount=source=/selinux,target=/selinux,rw \
 FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION}
 
 # Copy files from repo
-RUN ls -l /usr
 COPY --from=iapv /iapv/root/ /
 COPY --from=rwp /rwp/root/ /
 COPY rootfs/. /
