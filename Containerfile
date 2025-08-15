@@ -17,9 +17,10 @@ FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION}
 COPY rootfs/ /
 
 # Install yggdrasil
+# insights-client allows verifying the GPG key of the playbook
 # rhc-worker-playbook allows running playbooks from yggdrasil
 RUN dnf install -y podman yggdrasil && \
-    dnf install --enablerepo=centos -y rhc-worker-playbook && \
+    dnf install --enablerepo=centos -y insights-client rhc-worker-playbook && \
     dnf clean all
 
 # Install useful packages
