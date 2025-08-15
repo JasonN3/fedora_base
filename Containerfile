@@ -4,9 +4,8 @@ FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION} as iapv
 
 COPY external/insights-ansible-playbook-verifier /iapv
 
-RUN python3 -m venv /build && \
-    source /build/bin/activate && \
-    pip install setuptools && \
+RUN dnf install -y python3 python3-setuptools && \
+    dnf clean all && \
     cd /iapv && \
     mkdir /iapv/root && \
     python3 setup.py install \
@@ -21,7 +20,7 @@ COPY external/rhc-worker-playbook /rwp
 ENV GOCACHE /var/gocache
 ENV GOMODCACHE /var/gomodcache
 
-RUN dnf install -y 'pkgconfig(yggdrasil)' 'pkgconfig(dbus-1)' 'pkgconfig(systemd)' ansible-galaxy go meson tree cmake python3-pip
+RUN dnf install -y 'pkgconfig(yggdrasil)' 'pkgconfig(dbus-1)' 'pkgconfig(systemd)' ansible-core go meson tree cmake python3-pip
 
 RUN mkdir /rwp/root && \
     cd /rwp && \
