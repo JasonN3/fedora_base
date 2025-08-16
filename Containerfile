@@ -25,7 +25,8 @@ RUN dnf install -y 'pkgconfig(yggdrasil)' 'pkgconfig(dbus-1)' 'pkgconfig(systemd
 
 RUN cd /rwp && \
     meson build . \
-        --prefix=/rwp/root/usr/ && \
+        --prefix=/rwp/root/usr/ 
+        --sysconfdir=../etc && \
     cd build && \
     meson install && \
     mkdir -p \
