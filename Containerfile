@@ -52,7 +52,7 @@ COPY --from=rwp /rwp/root/ /
 COPY rootfs/. /
 
 # Install yggdrasil
-RUN dnf install -y podman yggdrasil && \
+RUN dnf install -y ansible-core podman yggdrasil && \
     dnf clean all
 
 # Install useful packages
