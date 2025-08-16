@@ -4,7 +4,7 @@ FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION} as iapv
 
 COPY external/insights-ansible-playbook-verifier /iapv
 
-ENV LC_ALL C
+ENV LC_ALL en_US.UTF-8
 
 RUN cd /iapv && \
     python -m venv venv && \
