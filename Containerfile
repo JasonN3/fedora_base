@@ -25,17 +25,9 @@ RUN dnf install -y 'pkgconfig(yggdrasil)' 'pkgconfig(dbus-1)' 'pkgconfig(systemd
 
 RUN cd /rwp && \
     meson build . \
-        --prefix=/rwp/root/usr/ \
-        --sysconfdir=../etc && \
+        --sysconfdir=../../etc && \
     cd build && \
-    meson install && \
-    mkdir -p \
-        /rwp/root/usr/share/dbus-1/system-services \
-        /rwp/root/usr/share/dbus-1/system.d \
-        /rwp/root/usr/lib/systemd/system && \
-    mv /usr/share/dbus-1/system-services/com.redhat.Yggdrasil1.Worker1.rhc_worker_playbook.service /rwp/root/usr/share/dbus-1/system-services/ &&\
-    mv /usr/share/dbus-1/system.d/com.redhat.Yggdrasil1.Worker1.rhc_worker_playbook.conf /rwp/root/usr/share/dbus-1/system.d/ && \
-    mv /usr/lib/systemd/system/com.redhat.Yggdrasil1.Worker1.rhc_worker_playbook.service /rwp/root/usr/lib/systemd/system/
+    meson install --destdir=/rwp/root
 
 FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION} as selinux
 
