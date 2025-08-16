@@ -7,11 +7,10 @@ ENV LC_ALL=C.UTF-8
 COPY external/insights-ansible-playbook-verifier /iapv
 
 RUN cd /iapv && \
-    python -m venv venv && \
-    source venv/bin/activate && \
+    python -m venv /opt/insights-ansible-playbook-verifier && \
+    source /opt/insights-ansible-playbook-verifier/bin/activate && \
     dnf clean all && \
-    mkdir -p /iapv/root && \
-    pip install . 
+    pip install .
 
 FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION} as rwp
 
@@ -47,7 +46,7 @@ FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION}
 ENV LC_ALL=C.UTF-8
 
 # Copy files from repo
-COPY --from=iapv /iapv/venv/ /opt/insights_ansible_playbook_verifier
+COPY --from=iapv /opt/insights-ansible-playbook-verifier/ /opt/insights_ansible_playbook_verifier/
 COPY --from=rwp /rwp/root/ /
 COPY rootfs/. /
 
