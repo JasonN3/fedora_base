@@ -1,0 +1,3 @@
+#!/bin/bash
+
+VIRTUAL_ENV=/opt/insights_ansible_playbook_verifier python3 "$@"

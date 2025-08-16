@@ -4,14 +4,12 @@ FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION} as iapv
 
 COPY external/insights-ansible-playbook-verifier /iapv
 
-RUN dnf install -y python3 python3-setuptools && \
+RUN cd /iapv && \
+    python -m venv venv && \
+    source venv/bin/activate && \
     dnf clean all && \
-    cd /iapv && \
     mkdir -p /iapv/root && \
-    python3 setup.py install \
-        --prefix=/iapv/root \
-        --install-scripts=/iapv/root/usr/bin \
-        --install-lib=/iapv/root/usr/lib
+    pip install . 
 
 FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION} as rwp
 
@@ -46,7 +44,7 @@ RUN --mount=source=/selinux,target=/selinux,rw \
 FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION}
 
 # Copy files from repo
-COPY --from=iapv /iapv/root/ /
+COPY --from=iapv /iapv/venv/ /opt/insights_ansible_playbook_verifier
 COPY --from=rwp /rwp/root/ /
 COPY rootfs/. /
 
