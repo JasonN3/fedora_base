@@ -26,15 +26,18 @@ ENV GOMODCACHE=/var/gomodcache
 
 RUN dnf install -y 'pkgconfig(yggdrasil)' 'pkgconfig(dbus-1)' 'pkgconfig(systemd)' ansible-core go meson tree cmake python3-pip
 
-RUN mkdir /rwp/root && \
-    cd /rwp && \
+RUN cd /rwp && \
     meson build . \
-        -Dprefix=/rwp/root \
-        -Dlibdir=/usr/lib64 \
-        -Dlibexecdir=/usr/libexec \
-        -Ddatadir=/usr/share && \
+        --prefix=/rwp/root/usr/ && \
     cd build && \
-    meson install
+    meson install && \
+    mkdir -p \
+        /rwp/root/usr/share/dbus-1/system-services \
+        /rwp/root/usr/share/dbus-1/system.d \
+        /rwp/root/usr/lib/systemd/system && \
+    mv /usr/share/dbus-1/system-services/com.redhat.Yggdrasil1.Worker1.rhc_worker_playbook.service /rwp/root/usr/share/dbus-1/system-services/ &&\
+    mv /usr/share/dbus-1/system.d/com.redhat.Yggdrasil1.Worker1.rhc_worker_playbook.conf /rwp/root/usr/share/dbus-1/system.d/ && \
+    mv /usr/lib/systemd/system/com.redhat.Yggdrasil1.Worker1.rhc_worker_playbook.service /rwp/root/usr/lib/systemd/system/
 
 FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION} as selinux
 
