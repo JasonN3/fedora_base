@@ -1,0 +1,12 @@
+- name: revocation list
+  timestamp: 1755360797
+  vars:
+    insights_signature_exclude: /vars/insights_signature
+    insights_signature: !!binary |
+      TFMwdExTMUNSVWRKVGlCUVIxQWdVMGxIVGtGVVZWSkZMUzB0TFMwS0NtbElWVVZCUWxsTFFVSXdW
+      MGxSVWtOTlJFRllTRWRVUTFaWk4wMW9WbVpXUTBveE5IbGtjbEF6ZDFWRFlVdERkbTlSUVV0RFVr
+      UldRMG94Tkhsa2NsQUtNemhDY1VGUWQwcE9hbkpKZUV3eFVWSjFlR3R0YlZneFZFTm5SblZXTjNa
+      TGRqRTNTbTF2YzBkbFRFeHlaRmg0VlZGRlFUTk9RbFJ5VnpJdlZsUnJlZ280U1haQlN6UjJkR2hY
+      S3pkNFlXTjNkMHQxVDA5NWVtcEVPRklyVkVGUlBRbzlkM0Z0YmdvdExTMHRMVVZPUkNCUVIxQWdV
+      MGxIVGtGVVZWSkZMUzB0TFMwSw==
+  revoked_playbooks: {}
