@@ -4,6 +4,8 @@ FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION} as iapv
 
 COPY external/insights-ansible-playbook-verifier /iapv
 
+ENV LC_ALL C
+
 RUN cd /iapv && \
     python -m venv venv && \
     source venv/bin/activate && \
@@ -44,7 +46,7 @@ RUN --mount=source=/selinux,target=/selinux,rw \
 FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION}
 
 # Copy files from repo
-#COPY --from=iapv /iapv/venv/ /opt/insights_ansible_playbook_verifier
+COPY --from=iapv /iapv/venv/ /opt/insights_ansible_playbook_verifier
 COPY --from=rwp /rwp/root/ /
 COPY rootfs/. /
 
