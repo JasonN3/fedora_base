@@ -1,8 +1,8 @@
 #!/bin/bash
 
-instructions=$(mktemp)
+instructions="$(mktemp)"
 
-cat << EOF > $instructions
+cat << EOF > "$instructions"
 Key-Type: EDDSA
   Key-Curve: ed25519
 Subkey-Type: ECDH
@@ -13,7 +13,7 @@ Expire-Date: 0
 %commit
 EOF
 
-gpg --batch --generate-key --pinentry-mode loopback $instructions
+gpg --batch --generate-key --pinentry-mode loopback "$instructions"
 
 gpg --export --armor | tee public.key > rootfs/usr/lib/playbooks/public.gpg
 
