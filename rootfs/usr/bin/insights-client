@@ -1,0 +1,3 @@
+#!/bin/bash
+
+/opt/insights-ansible-playbook-verifier/bin/insights-ansible-playbook-verifier --stdin --revocation-list /usr/lib/playbooks/revoked_playbooks.yaml --key /usr/lib/playbooks/public.gpg

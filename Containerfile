@@ -1,6 +1,36 @@
 ARG FEDORA_BOOTC_VERSION=43
 
+FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION} as iapv
+
+ENV LC_ALL=C.UTF-8
+
+COPY external/insights-ansible-playbook-verifier /iapv
+
+RUN cd /iapv && \
+    python -m venv /opt/insights-ansible-playbook-verifier && \
+    source /opt/insights-ansible-playbook-verifier/bin/activate && \
+    dnf clean all && \
+    pip install .
+
+FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION} as rwp
+
+ENV LC_ALL=C.UTF-8
+ENV GOCACHE=/var/gocache
+ENV GOMODCACHE=/var/gomodcache
+
+COPY external/rhc-worker-playbook /rwp
+
+RUN dnf install -y 'pkgconfig(yggdrasil)' 'pkgconfig(dbus-1)' 'pkgconfig(systemd)' ansible-core go meson tree cmake python3-pip
+
+RUN cd /rwp && \
+    meson build . \
+        --prefix=/usr && \
+    cd build && \
+    meson install --destdir=/rwp/root
+
 FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION} as selinux
+
+ENV LC_ALL=C.UTF-8
 
 RUN dnf install -y checkpolicy \
                    make \
@@ -9,20 +39,20 @@ RUN dnf install -y checkpolicy \
 RUN --mount=source=/selinux,target=/selinux,rw \
     cd /selinux && \
     make all && \
-    mkdir /selinux-pp && \
-    mv /selinux/*.pp /selinux-pp/
+    make move
 
 FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION}
 
-# Install and enable flightctl-agent
-RUN dnf install -y dnf5-plugins && \
-    dnf copr enable -y @redhat-et/flightctl && \
-    dnf install -y flightctl-agent podman podman-compose && \
-    dnf clean all && \
-    systemctl enable flightctl-agent.service
+ENV LC_ALL=C.UTF-8
 
 # Copy files from repo
-COPY rootfs/ /
+COPY --from=iapv /opt/insights-ansible-playbook-verifier/ /opt/insights-ansible-playbook-verifier/
+COPY --from=rwp /rwp/root/ /
+COPY rootfs/. /
+
+# Install yggdrasil
+RUN dnf install -y ansible-core podman yggdrasil && \
+    dnf clean all
 
 # Install useful packages
 RUN dnf install -y cloud-init tmux which rsync && \
@@ -33,7 +63,8 @@ RUN systemctl enable nftables.service \
                      protect_etc.service \
                      pull_images.path \
                      fix_perms_nm.path \
-                     cloud-init.target
+                     cloud-init.target \
+                     yggdrasil.service
 
 # Install packages for OIDC authentication
 RUN dnf install -y authselect \

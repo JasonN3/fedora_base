@@ -1,0 +1,9 @@
+# This file contains a list of revoked playbook signatures
+- name: revocation list
+  timestamp: DATE
+  vars:
+    insights_signature_exclude: /vars/insights_signature
+
+  revoked_playbooks:
+    - name: template_playbook_dispatcher_ostree_upgrade_payload.yml bb3cb30e
+      hash: 8ddc7c9fb264aa24d7b3536ecf00272ca143c2ddb14a499cdefab045f3403e9b
