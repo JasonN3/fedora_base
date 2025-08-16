@@ -6,8 +6,6 @@ ENV LC_ALL=C.UTF-8
 
 COPY external/insights-ansible-playbook-verifier /iapv
 
-RUN locale
-
 RUN cd /iapv && \
     python -m venv venv && \
     source venv/bin/activate && \
@@ -18,11 +16,10 @@ RUN cd /iapv && \
 FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION} as rwp
 
 ENV LC_ALL=C.UTF-8
-
-COPY external/rhc-worker-playbook /rwp
-
 ENV GOCACHE=/var/gocache
 ENV GOMODCACHE=/var/gomodcache
+
+COPY external/rhc-worker-playbook /rwp
 
 RUN dnf install -y 'pkgconfig(yggdrasil)' 'pkgconfig(dbus-1)' 'pkgconfig(systemd)' ansible-core go meson tree cmake python3-pip
 
@@ -57,7 +54,6 @@ FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION}
 ENV LC_ALL=C.UTF-8
 
 # Copy files from repo
-RUN locale
 COPY --from=iapv /iapv/venv/ /opt/insights_ansible_playbook_verifier
 COPY --from=rwp /rwp/root/ /
 COPY rootfs/. /
