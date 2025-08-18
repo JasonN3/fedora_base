@@ -61,7 +61,7 @@ RUN dnf install -y cloud-init tmux which rsync && \
 # Install additional Ansible Collections for rhc-worker-playbook
 RUN --mount=source=/playbooks,target=/playbooks \
     ansible-galaxy collection install \
-        -p /usr/share/rhc-worker-playbook/ansible/collections
+        -p /usr/share/rhc-worker-playbook/ansible/collections \
         -r /playbooks/requirements.yaml
 
 # Enable services
