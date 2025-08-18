@@ -41,6 +41,12 @@ RUN --mount=source=/selinux,target=/selinux,rw \
     make all && \
     make move
 
+FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION} as python
+
+RUN dnf install -y python3-pip
+
+RUN --mount=source=/playbooks,target=/playbooks python -m pip install -r /playbooks/requirements.txt --target /python
+
 FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION}
 
 ENV LC_ALL=C.UTF-8
@@ -63,6 +69,8 @@ RUN --mount=source=/playbooks,target=/playbooks \
     ansible-galaxy collection install \
         -p /usr/share/rhc-worker-playbook/ansible/collections \
         -r /playbooks/requirements.yaml
+
+COPY --from=python /python/ /usr/lib64/rhc-worker-playbook/
 
 # Enable services
 RUN systemctl enable nftables.service \
@@ -100,6 +108,5 @@ RUN rm -Rf /var/log/dnf5* \
            /var/lib/dnf \
            /var/cache/ldconfig/aux-cache \
            /var/roothome
-
 
 RUN bootc container lint --fatal-warnings
