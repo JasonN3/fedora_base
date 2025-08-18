@@ -58,6 +58,12 @@ RUN dnf install -y ansible-core podman yggdrasil && \
 RUN dnf install -y cloud-init tmux which rsync && \
     dnf clean all
 
+# Install additional Ansible Collections for rhc-worker-playbook
+RUN --mount=source=/playbooks,target=/playbooks \
+    ansible-galaxy collections install \
+        -p /usr/share/rhc-worker-playbook/ansible/collections
+        -r /playbooks/requirements.yaml
+
 # Enable services
 RUN systemctl enable nftables.service \
                      protect_etc.service \
