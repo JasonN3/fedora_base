@@ -1,0 +1,83 @@
+---
+- name: Set SSSD Config
+  hosts: localhost
+  vars:
+    insights_signature_exclude: /vars/insights_signature
+  tasks:
+    - name: Import playbook vars
+      ansible.builtin.include_vars:
+        file: /etc/playbooks/vars.yaml
+
+    - name: Get SSSD config
+      community.hashi_vault.vault_kv2_get:
+        url: '{{ vault.server }}'
+        engine_mount_point: '{{ vault.mountpoint }}'
+        path: '{{ vault.root }}/sssd/config'
+        # TODO: Replace with certificate
+        auth_method: approle
+        role_id: '{{ vault.role }}'
+        secret_id: '{{ vault.secret }}'
+      register: sssd_config
+
+    - name: Read domain configs
+      community.hashi_vault.vault_kv2_get:
+        url: '{{ vault.server }}'
+        engine_mount_point: '{{ vault.mountpoint }}'
+        path: '{{ vault.root }}/sssd/domains/{{ item }}'
+        # TODO: Replace with certificate
+        auth_method: approle
+        role_id: '{{ vault.role }}'
+        secret_id: '{{ vault.secret }}'
+      register: sssd_domain_config
+      loop: "{{ sssd_config.data.data.domains | split(',') }}"
+
+    - name: Write domain config
+      loop: "{{ sssd_domain_config.results }}"
+      ansible.builtin.copy:
+        dest: "/etc/sssd/conf.d/{{ item.item }}.conf"
+        owner: root
+        group: root
+        mode: '0440'
+        content: |
+          [domain/{{ item.item }}]
+          id_provider = idp
+          auto_private_groups = true
+          use_fully_qualified_names = true
+          idp_client_id = {{ item.data.data.clientId }}
+          idp_client_secret = {{ item.data.data.clientSecret }}
+          idp_token_endpoint = https://login.microsoftonline.com/{{ item.data.data.tenant }}/oauth2/v2.0/token
+          idp_device_auth_endpoint = https://login.microsoftonline.com/{{ item.data.data.tenant }}/oauth2/v2.0/devicecode
+          idp_userinfo_endpoint = https://graph.microsoft.com/v1.0/me
+          idp_id_scope = https%3A%2F%2Fgraph.microsoft.com%2F.default
+          idp_auth_scope = openid profile email
+      notify:
+        - Restart sssd
+    
+    - name: Write SSSD config
+      ansible.builtin.copy:
+        dest: "/etc/sssd/conf.d/sssd.conf"
+        owner: root
+        group: root
+        mode: '0440'
+        content: |
+          [sssd]
+          services = nss, pam
+          config_file_version = 2
+          domains = {{ sssd_domain_config.results | map(attribute='item') | list | join(',') }}
+          default_domain_suffix = {{ ((sssd_domain_config.results | selectattr('data.data.default', 'equalto', true) | list | first) or (sssd_domain_config.results | first).data.data).item }}
+      notify:
+        - Restart sssd
+
+    - name: Set default domain
+      ansible.builtin.lineinfile:
+        path: /etc/krb5.conf
+        regexp: '^#?\s+default_realm ?=.*$'
+        line: "    default_realm = {{ ((sssd_domain_config.results | selectattr('data.data.default', 'equalto', true) | list | first) or (sssd_domain_config.results | first).data.data).item }}"
+      notify:
+        - Restart sssd
+
+  handlers:
+    - name: Restart sssd
+      ansible.builtin.service:
+        name: sssd
+        state: restarted
