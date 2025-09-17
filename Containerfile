@@ -25,7 +25,7 @@ RUN dnf install -y dnf5-plugins && \
 COPY rootfs/ /
 
 # Install useful packages
-RUN dnf install -y cloud-init tmux which rsync watchdog && \
+RUN dnf install -y cloud-init tmux which rsync && \
     dnf clean all
 
 # Enable services
@@ -33,14 +33,7 @@ RUN systemctl enable nftables.service \
                      protect_etc.service \
                      pull_images.path \
                      fix_perms_nm.path \
-                     cloud-init.target \
-                     watchdog.service
-
-# Enable watchdog device
-RUN sed -i 's/#watchdog-device/watchdog-device/' /etc/watchdog.conf
-
-# Debug 
-RUN cat /etc/watchdog.conf
+                     cloud-init.target
 
 # Install packages for OIDC authentication
 RUN dnf install -y authselect \
