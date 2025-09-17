@@ -35,6 +35,8 @@ RUN systemctl enable nftables.service \
                      fix_perms_nm.path \
                      cloud-init.target \
                      watchdog.service
+# Debug
+RUN find /etc -name "watchdog*" -exec cat {} ';'
 
 # Install packages for OIDC authentication
 RUN dnf install -y authselect \
