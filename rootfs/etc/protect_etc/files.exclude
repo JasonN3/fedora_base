@@ -7,3 +7,4 @@ selinux
 ssh/sshd_config
 sssd/sssd.conf
 sssd/conf.d
+systemd/journald.conf
