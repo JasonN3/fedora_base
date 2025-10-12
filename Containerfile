@@ -63,5 +63,4 @@ RUN rm -Rf /var/log/dnf5* \
            /var/lib/dnf \
            /var/cache/ldconfig/aux-cache
 
-
 RUN bootc container lint --fatal-warnings
