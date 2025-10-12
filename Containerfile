@@ -63,7 +63,4 @@ RUN rm -Rf /var/log/dnf5* \
            /var/lib/dnf \
            /var/cache/ldconfig/aux-cache
 
-RUN ls -l /var/lib/authselect/checksum 
-
-
 RUN bootc container lint --fatal-warnings
