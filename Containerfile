@@ -25,7 +25,7 @@ RUN dnf install -y dnf5-plugins && \
 COPY rootfs/ /
 
 # Install useful packages
-RUN dnf install -y cloud-init tmux which rsync && \
+RUN dnf install -y cloud-init tmux which rsync rsyslog && \
     dnf clean all
 
 # Enable services
