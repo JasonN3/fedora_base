@@ -1,6 +1,8 @@
 localtime
 shadow
 machine-id
+NetworkManager/conf.d
+NetworkManager/system-connections
 nftables/local.nft.d
 rsyslog.conf
 rsyslog.d
