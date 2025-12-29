@@ -10,7 +10,7 @@ RUN --mount=source=/selinux,target=/selinux,rw \
     cd /selinux && \
     make all && \
     mkdir -p /selinux-pp && \
-    [[ -n "$(ls /selinux/*.pp)" ]] && mv /selinux/*.pp /selinux-pp/;
+    find /selinux -name "*.pp" -exec mv {} /selinux-pp/ \;
 
 FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION}
 
