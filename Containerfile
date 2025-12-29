@@ -14,12 +14,11 @@ RUN --mount=source=/selinux,target=/selinux,rw \
 
 FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION}
 
-# Install and enable flightctl-agent
-RUN dnf install -y dnf5-plugins && \
-    dnf copr enable -y @redhat-et/flightctl && \
-    dnf install -y flightctl-agent podman podman-compose && \
+# Install and enable openvox
+RUN dnf install -y https://yum.voxpupuli.org/openvox8-release-fedora-${FEDORA_BOOTC_VERSION}.noarch.rpm && \
+    dnf install -y openvox-agent podman podman-compose && \
     dnf clean all && \
-    systemctl enable flightctl-agent.service
+    systemctl enable puppet.service
 
 # Copy files from repo
 COPY rootfs/ /
