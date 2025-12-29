@@ -4,6 +4,7 @@ machine-id
 NetworkManager/conf.d
 NetworkManager/system-connections
 nftables/local.nft.d
+puppetlabs/puppet/puppet.conf
 rsyslog.conf
 rsyslog.d
 selinux
