@@ -15,7 +15,8 @@ RUN --mount=source=/selinux,target=/selinux,rw \
 FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION}
 
 # Install and enable openvox
-RUN dnf install -y https://yum.voxpupuli.org/openvox8-release-fedora-${FEDORA_BOOTC_VERSION}.noarch.rpm && \
+RUN source /etc/os-release && \
+    dnf install -y https://yum.voxpupuli.org/openvox8-release-fedora-${VERSION_ID}.noarch.rpm && \
     dnf install -y openvox-agent podman podman-compose && \
     dnf clean all && \
     systemctl enable puppet.service
