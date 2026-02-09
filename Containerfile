@@ -9,17 +9,17 @@ RUN dnf install -y checkpolicy \
 RUN --mount=source=/selinux,target=/selinux,rw \
     cd /selinux && \
     make all && \
-    mkdir /selinux-pp && \
-    mv /selinux/*.pp /selinux-pp/
+    mkdir -p /selinux-pp && \
+    find /selinux -name "*.pp" -exec mv {} /selinux-pp/ \;
 
 FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION}
 
-# Install and enable flightctl-agent
-RUN dnf install -y dnf5-plugins && \
-    dnf copr enable -y @redhat-et/flightctl && \
-    dnf install -y flightctl-agent podman podman-compose && \
+# Install and enable openvox
+RUN source /etc/os-release && \
+    dnf install -y https://yum.voxpupuli.org/openvox8-release-fedora-${VERSION_ID}.noarch.rpm && \
+    dnf install -y openvox-agent podman podman-compose && \
     dnf clean all && \
-    systemctl enable flightctl-agent.service
+    systemctl enable puppet.service
 
 # Copy files from repo
 COPY rootfs/ /
