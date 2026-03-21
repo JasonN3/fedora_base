@@ -200,7 +200,7 @@ jobs:
           xz -vz -T0 output/${{ matrix.arch }}.raw
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: output-image-${{ matrix.arch }}
           path: output/*.raw.xz
