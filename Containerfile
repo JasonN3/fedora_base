@@ -15,7 +15,8 @@ RUN --mount=source=/selinux,target=/selinux,rw \
 FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION}
 
 # Install and enable openvox
-RUN source /etc/os-release && \
+RUN --mount=type=tmpfs,target=/run \
+    source /etc/os-release && \
     dnf install -y https://yum.voxpupuli.org/openvox8-release-fedora-${VERSION_ID}.noarch.rpm && \
     dnf install -y openvox-agent podman podman-compose && \
     dnf clean all && \
@@ -25,7 +26,8 @@ RUN source /etc/os-release && \
 COPY rootfs/ /
 
 # Install useful packages
-RUN dnf install -y cloud-init tmux which rsync rsyslog && \
+RUN --mount=type=tmpfs,target=/run \
+    dnf install -y cloud-init tmux which rsync rsyslog && \
     dnf clean all
 
 # Enable services
@@ -35,7 +37,8 @@ RUN systemctl enable nftables.service \
                      cloud-init.target
 
 # Install packages for OIDC authentication
-RUN dnf install -y authselect \
+RUN --mount=type=tmpfs,target=/run \
+    dnf install -y authselect \
                    chrony \
                    oddjobd \
                    oddjob-mkhomedir \
@@ -60,7 +63,6 @@ RUN --mount=from=selinux,source=/selinux-pp,target=/selinux \
 RUN rm -Rf /var/log/dnf5* \
            /var/cache/libdnf5 \
            /var/lib/dnf \
-           /var/cache/ldconfig/aux-cache \
-           /run
+           /var/cache/ldconfig/aux-cache
 
 RUN bootc container lint --fatal-warnings
