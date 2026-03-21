@@ -60,6 +60,7 @@ RUN --mount=from=selinux,source=/selinux-pp,target=/selinux \
 RUN rm -Rf /var/log/dnf5* \
            /var/cache/libdnf5 \
            /var/lib/dnf \
-           /var/cache/ldconfig/aux-cache
+           /var/cache/ldconfig/aux-cache \
+           /run
 
 RUN bootc container lint --fatal-warnings
