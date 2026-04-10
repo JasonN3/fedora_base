@@ -1,0 +1,36 @@
+FROM quay.io/fedora/fedora:latest AS armbian_kernel
+
+RUN dnf install -y xz jq curl dpkg
+
+WORKDIR /tmp/armbian
+
+# Fetch directory listing and pick the newest minimal image
+RUN curl -s https://armbian.hosthatch.com/dl/renegade/archive/ \
+    | grep -o 'Armbian_[^"]*_minimal.img.xz' \
+    | sort -V \
+    | tail -n 1 \
+    > image_name
+
+# Download the image
+RUN curl -L -o armbian.img.xz "https://armbian.hosthatch.com/dl/renegade/archive/$(cat image_name)"
+
+# Extract the image
+RUN SECTOR_START=$(fdisk -l armbian.img | awk '/img1/ {print $2}') && \
+    OFFSET=$((SECTOR_START * 512)) && \
+    mkdir mnt && \
+    mount -o loop,offset=$OFFSET armbian.img mnt && \
+    cp -r mnt/boot /tmp/armbian/boot && \
+    cp -r mnt/usr/lib/linux-image-* /tmp/armbian/linux-image && \
+    cp -r mnt/lib/modules /tmp/armbian/modules && \
+    umount mnt
+
+FROM ghcr.io/jasonn3/fedora_base:main
+
+# Install kernel, initrd, dtbs, modules
+COPY --from=armbian_kernel /tmp/armbian/boot/vmlinuz-*       /boot/
+COPY --from=armbian_kernel /tmp/armbian/boot/initrd.img-*    /boot/
+COPY --from=armbian_kernel /tmp/armbian/linux-image/rockchip /boot/dtb/
+COPY --from=armbian_kernel /tmp/armbian/modules/*            /lib/modules/
+
+# Provide bootloader entry
+COPY --from=armbian_kernel extlinux.conf /boot/extlinux/extlinux.conf
