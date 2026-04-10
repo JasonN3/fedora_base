@@ -13,7 +13,7 @@ RUN curl -s https://armbian.hosthatch.com/dl/renegade/archive/ \
 
 # Download the image
 RUN curl -L -o armbian.img.xz "https://armbian.hosthatch.com/dl/renegade/archive/$(cat image_name)" && \
-    unxz armbian.img
+    unxz armbian.img.xz
 
 # Extract the image
 RUN SECTOR_START=$(fdisk -l armbian.img | awk '/img1/ {print $2}') && \
