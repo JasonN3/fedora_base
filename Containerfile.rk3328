@@ -1,30 +1,13 @@
 FROM quay.io/fedora/fedora:latest AS armbian_kernel
 
-RUN dnf install -y xz jq curl dpkg fdisk
-
 WORKDIR /tmp/armbian
 
-# Fetch directory listing and pick the newest minimal image
-RUN curl -s https://armbian.hosthatch.com/dl/renegade/archive/ \
-    | grep -o 'Armbian_[^"]*_minimal.img.xz' \
-    | sort -V \
-    | tail -n 1 \
-    > image_name
-
-# Download the image
-RUN curl -L -o armbian.img.xz "https://armbian.hosthatch.com/dl/renegade/archive/$(cat image_name)" && \
-    unxz armbian.img.xz
-
 # Extract the image
-RUN SECTOR_START=$(fdisk -l armbian.img | awk '/img1/ {print $2}') && \
-    OFFSET=$((SECTOR_START * 512)) && \
-    mkdir mnt && \
-    mount -o loop,offset=$OFFSET armbian.img mnt && \
-    cp -rv mnt/lib/modules                    /tmp/armbian/modules                                    && \
-    cp -rv mnt/boot/vmlinuz-*                 /tmp/armbian/modules/$(ls /tmp/armbian/modules)/vmlinuz && \
-    cp -rv mnt/boot/initrd.img-*              /tmp/armbian/modules/$(ls /tmp/armbian/modules)/initrd  && \
-    cp -rv mnt/usr/lib/linux-image-*/rockchip /tmp/armbian/modules/$(ls /tmp/armbian/modules)/dtb/    && \
-    umount mnt
+RUN --mount=type=bind,source=armbian_mnt,dst=/mnt \
+    cp -rv /mnt/lib/modules                    /tmp/armbian/modules                                    && \
+    cp -rv /mnt/boot/vmlinuz-*                 /tmp/armbian/modules/$(ls /tmp/armbian/modules)/vmlinuz && \
+    cp -rv /mnt/boot/initrd.img-*              /tmp/armbian/modules/$(ls /tmp/armbian/modules)/initrd  && \
+    cp -rv /mnt/usr/lib/linux-image-*/rockchip /tmp/armbian/modules/$(ls /tmp/armbian/modules)/dtb/
 
 FROM ghcr.io/jasonn3/fedora_base:main
 

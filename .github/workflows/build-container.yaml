@@ -143,7 +143,7 @@ jobs:
         uses: docker/metadata-action@v6
         with:
           flavor: |
-            suffix=-${{ matrix.arch }}
+            suffix=-${{ matrix.arch }}-rk3328
           images: |
             ghcr.io/${{ github.repository }}
           tags: |
@@ -152,6 +152,21 @@ jobs:
             type=semver,pattern=v{{version}}
             type=semver,pattern=v{{major}}.{{minor}}
             type=semver,pattern=v{{major}}.{{minor}}.{{patch}}
+
+      - name: Download and extract kernel
+        run: |
+          sudo apt update
+          sudo apt install -y xz jq curl dpkg fdisk
+          IMAGE_NAME=$(curl -s https://armbian.hosthatch.com/dl/renegade/archive/ \
+            | grep -o 'Armbian_[^"]*_minimal.img.xz' \
+            | sort -V \
+            | tail -n 1)
+          curl -L -o armbian.img.xz "https://armbian.hosthatch.com/dl/renegade/archive/${IMAGE_NAME}"
+          unxz armbian.img.xz
+          SECTOR_START=$(fdisk -l armbian.img | awk '/img1/ {print $2}')
+          OFFSET=$((SECTOR_START * 512))
+          mkdir -p armbian_mnt
+          sudo mount -o loop,offset=$OFFSET armbian.img armbian_mnt
 
       - name: Buildah Build
         id: build-image
@@ -168,15 +183,6 @@ jobs:
           tags: ${{ steps.build-image.outputs.tags }}
           username: ${{ github.actor }}
           password: ${{ github.token }}
-
-      - name: Trigger other builds
-        if: github.ref_name == github.event.repository.default_branch
-        env:
-          repo_owner: ${{ github.repository_owner }}
-          token: ${{ secrets.TRIGGER_PAT }}
-        run: |
-          chmod +x scripts/trigger_builds/trigger_builds.sh
-          ./scripts/trigger_builds/trigger_builds.sh
 
   make-raw:
     name: Create Raw Image
