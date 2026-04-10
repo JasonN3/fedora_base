@@ -1,6 +1,6 @@
 FROM quay.io/fedora/fedora:latest AS armbian_kernel
 
-RUN dnf install -y xz jq curl dpkg
+RUN dnf install -y xz jq curl dpkg fdisk
 
 WORKDIR /tmp/armbian
 
