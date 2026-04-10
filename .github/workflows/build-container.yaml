@@ -156,7 +156,7 @@ jobs:
       - name: Download and extract kernel
         run: |
           sudo apt update
-          sudo apt install -y xz jq curl dpkg fdisk
+          sudo apt install -y xz-utils jq curl dpkg fdisk
           IMAGE_NAME=$(curl -s https://armbian.hosthatch.com/dl/renegade/archive/ \
             | grep -o 'Armbian_[^"]*_minimal.img.xz' \
             | sort -V \
