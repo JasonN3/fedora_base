@@ -1,4 +1,4 @@
-ARG FEDORA_BOOTC_VERSION=43
+ARG FEDORA_BOOTC_VERSION=44
 
 FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION} as selinux
 
