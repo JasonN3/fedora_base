@@ -1,4 +1,4 @@
-ARG FEDORA_BOOTC_VERSION=43
+ARG FEDORA_BOOTC_VERSION=44
 
 FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION} as selinux
 
@@ -17,8 +17,13 @@ FROM quay.io/fedora/fedora-bootc:${FEDORA_BOOTC_VERSION}
 # Install and enable openvox
 RUN --mount=type=tmpfs,target=/run \
     source /etc/os-release && \
-    dnf install -y https://yum.voxpupuli.org/openvox8-release-fedora-${VERSION_ID}.noarch.rpm && \
-    dnf install -y openvox-agent podman podman-compose && \
+    ( ( dnf install -y https://yum.voxpupuli.org/openvox8-release-fedora-${VERSION_ID}.noarch.rpm && \
+        dnf install -y openvox-agent \
+      ) || \
+      ( dnf install -y rubygems rubygem-{scanf,racc,hocon,thor,locale,deep_merge,concurrent-ruby} && \
+        gem install openvox \
+    ) ) && \
+    dnf install -y podman podman-compose && \
     dnf clean all && \
     systemctl enable puppet.service
 
