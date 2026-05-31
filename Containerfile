@@ -20,7 +20,7 @@ RUN --mount=type=tmpfs,target=/run \
     ( ( dnf install -y https://yum.voxpupuli.org/openvox8-release-fedora-${VERSION_ID}.noarch.rpm && \
         dnf install -y openvox-agent \
       ) || \
-      ( dnf remove -y openvox8-release-fedora 2>/dev/null || true && \
+      ( dnf remove -y openvox8-release-fedora; \
         dnf install -y rubygems rubygem-{scanf,racc,hocon,thor,locale,deep_merge,concurrent-ruby} && \
         gem install openvox && \
         ln -s /usr/local/share/gems/gems/openvox-*/ext/systemd/puppet.service /usr/lib/systemd/system/puppet.service && \
