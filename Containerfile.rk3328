@@ -1,0 +1,18 @@
+FROM quay.io/fedora/fedora:latest AS armbian_kernel
+
+WORKDIR /tmp/armbian
+
+# Extract the image
+RUN --mount=type=bind,source=armbian_mnt,dst=/mnt \
+    cp -rv /mnt/lib/modules                    /tmp/armbian/modules                                    && \
+    cp -rv /mnt/boot/vmlinuz-*                 /tmp/armbian/modules/$(ls /tmp/armbian/modules)/vmlinuz && \
+    cp -rv /mnt/boot/initrd.img-*              /tmp/armbian/modules/$(ls /tmp/armbian/modules)/initrd  && \
+    cp -rv /mnt/usr/lib/linux-image-*/rockchip /tmp/armbian/modules/$(ls /tmp/armbian/modules)/dtb/
+
+FROM ghcr.io/jasonn3/fedora_base:main
+
+# Remove original kernel
+RUN rm -Rf /usr/lib/modules/*
+
+# Add copied data
+COPY --from=armbian_kernel /tmp/armbian/modules/*            /usr/lib/modules/

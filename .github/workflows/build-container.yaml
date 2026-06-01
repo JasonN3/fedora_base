@@ -117,6 +117,73 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ github.token }}
 
+  build-rockchip:
+    strategy:
+      matrix:
+        os:
+          - ubuntu-24.04-arm
+        include:
+          - os: ubuntu-24.04-arm
+            arch: arm64
+    name: Build Rockchip Container Image
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+          fetch-depth: 0
+          fetch-tags: 'true'
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          flavor: |
+            suffix=-${{ matrix.arch }}-rk3328
+          images: |
+            ghcr.io/${{ github.repository }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern=v{{version}}
+            type=semver,pattern=v{{major}}.{{minor}}
+            type=semver,pattern=v{{major}}.{{minor}}.{{patch}}
+
+      - name: Download and extract kernel
+        run: |
+          sudo apt update
+          sudo apt install -y xz-utils jq curl dpkg fdisk
+          IMAGE_NAME=$(curl -s https://armbian.hosthatch.com/dl/renegade/archive/ \
+            | grep -o 'Armbian_[^"]*_minimal.img.xz' \
+            | sort -V \
+            | tail -n 1)
+          curl -L -o armbian.img.xz "https://armbian.hosthatch.com/dl/renegade/archive/${IMAGE_NAME}"
+          unxz armbian.img.xz
+          SECTOR_START=$(fdisk -l armbian.img | awk '/img1/ {print $2}')
+          OFFSET=$((SECTOR_START * 512))
+          mkdir -p armbian_mnt
+          sudo mount -o loop,offset=$OFFSET armbian.img armbian_mnt
+
+      - name: Buildah Build
+        id: build-image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          containerfiles: Containerfile.rk3328
+          tags: ${{ steps.meta.outputs.tags || steps.meta_pr.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels || steps.meta_pr.outputs.labels }}
+
+      - name: Push image
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
   make-raw:
     name: Create Raw Image
     strategy:
