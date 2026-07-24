@@ -61,7 +61,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels || steps.meta_pr.outputs.labels }}
 
       - name: Push image
-        uses: redhat-actions/push-to-registry@v2
+        uses: redhat-actions/push-to-registry@v3
         with:
           image: ${{ steps.build-image.outputs.image }}
           tags: ${{ steps.build-image.outputs.tags }}
@@ -110,7 +110,7 @@ jobs:
               --arch arm64
           done
       - name: Push manifest
-        uses: redhat-actions/push-to-registry@v2
+        uses: redhat-actions/push-to-registry@v3
         with:
           image: ghcr.io/${{ github.repository }}
           tags: ${{ steps.meta.outputs.tags }}
